@@ -1,0 +1,1008 @@
+﻿map=Official Map
+version=1.0
+update=28.06.18
+towns=106
+//Посёлок, город, столица
+newtype=Посёлок
+newtype=Город
+newtype=Столица
+
+town=0
+name=Жилино
+type=0
+posx=378.472
+posy=401.261
+road= 2 B
+
+town=1
+name=Иваново
+type=0
+posx=345.204
+posy=397.791
+road= 1 B
+road= 3 B
+
+town=2
+name=Облепихово
+type=0
+posx=307.582
+posy=390.391
+road= 2 B
+road= 4 B
+
+town=3
+name=Медвежий
+type=0
+posx=267.389
+posy=392.494
+road= 3 B
+road= 5 B
+road= 6 B
+
+town=4
+name=Яснов
+type=0
+posx=282.876
+posy=361.028
+road= 4 B
+
+town=5
+name=Донинск
+type=1
+posx=242.291
+posy=383.538
+road= 4 B
+road= 7 G
+
+town=6
+name=Клыково
+type=0
+posx=222.973
+posy=364.143
+road= 6 G
+road= 8 G
+
+town=7
+name=Поречье
+type=1
+posx=204.96
+posy=343.628
+road= 7 G
+road= 9 G
+road= 58 B
+
+town=8
+name=Полнолун
+type=0
+posx=203.168
+posy=319.695
+road= 8 G
+road= 10 B
+road= 58 B
+road= 59 G
+
+town=9
+name=Мишкино
+type=0
+posx=238.973
+posy=318.613
+road= 9 B
+road= 11 B
+road= 61 B
+
+town=10
+name=Шишкино
+type=0
+posx=279.555
+posy=318.068
+road= 10 B
+road= 12 B
+road= 64 B
+
+town=11
+name=Зубовск
+type=1
+posx=318.551
+posy=307.989
+road= 11 B
+road= 13 G
+road= 64 G
+road= 65 B
+
+town=12
+name=Светлово
+type=0
+posx=336.837
+posy=323.576
+road= 12 G
+road= 14 G
+road= 17 B
+
+town=13
+name=Сасово
+type=0
+posx=354.958
+posy=337.456
+road= 13 G
+road= 15 G
+
+town=14
+name=Виноградов
+type=1
+posx=372.638
+posy=351.281
+road= 14 G
+road= 16 B
+road= 17 B
+
+town=15
+name=Гора
+type=0
+posx=378.87
+posy=370.442
+road= 15 B
+
+town=16
+name=Лесово
+type=0
+posx=376.65
+posy=308.946
+road= 13 B
+road= 15 B
+road= 18 B
+road= 65 B
+
+town=17
+name=Дальний
+type=0
+posx=381.78
+posy=255.874
+road= 17 B
+road= 19 B
+
+town=18
+name=Ягодный
+type=0
+posx=392.961
+posy=217.897
+road= 18 B
+road= 20 B
+
+town=19
+name=Орехов
+type=1
+posx=369.281
+posy=191.569
+road= 19 B
+road= 21 G
+road= 22 G
+
+town=20
+name=Корск
+type=0
+posx=349.673
+posy=198.179
+road= 20 G
+road= 67 G
+
+town=21
+name=Сергеево
+type=0
+posx=378.026
+posy=172.63
+road= 20 G
+road= 23 G
+road= 70 B
+
+town=22
+name=Глухари
+type=0
+posx=381.609
+posy=148.327
+road= 22 G
+road= 24 G
+road= 70 B
+
+town=23
+name=Кострово
+type=1
+posx=378.727
+posy=122.778
+road= 23 G
+road= 25 G
+road= 70 B
+
+town=24
+name=Шахов
+type=0
+posx=382.693
+posy=103.886
+road= 24 G
+road= 26 G
+road= 29 B
+road= 30 B
+
+town=25
+name=Яицков
+type=0
+posx=384.18
+posy=81.469
+road= 25 G
+road= 27 G
+road= 29 B
+
+town=26
+name=Челюстин
+type=1
+posx=374.211
+posy=65.111
+road= 26 G
+road= 28 B
+road= 29 G
+
+town=27
+name=Карпов
+type=0
+posx=398.556
+posy=53.434
+road= 27 B
+
+town=28
+name=Пристань
+type=0
+posx=360.056
+posy=86.206
+road= 26 B
+road= 26 B
+road= 27 G
+road= 30 G
+
+town=29
+name=Кораблёв
+type=0
+posx=338.355
+posy=102.179
+road= 25 B
+road= 29 G
+road= 31 G
+
+town=30
+name=Белов
+type=1
+posx=300.571
+posy=105.318
+road= 30 G
+road= 32 B
+road= 71 G
+
+town=31
+name=Бараново
+type=0
+posx=245.5
+posy=100.8
+road= 31 B
+road= 33 B
+road= 91 B
+
+town=32
+name=Котовск
+type=1
+posx=214.187
+posy=72.369
+road= 32 B
+road= 34 B
+road= 92 B
+
+town=33
+name=Наречье
+type=0
+posx=166.984
+posy=73.927
+road= 33 B
+road= 35 B
+
+town=34
+name=Капканов
+type=0
+posx=123.831
+posy=79.691
+road= 34 B
+road= 36 B
+road= 93 B
+
+town=35
+name=Краснодарск
+type=1
+posx=93.686
+posy=89.272
+road= 35 B
+road= 37 B
+road= 93 G
+road= 96 B
+
+town=36
+name=Серов
+type=0
+posx=77.64
+posy=137.099
+road= 36 B
+road= 38 B
+road= 96 B
+
+town=37
+name=Алабино
+type=0
+posx=55.285
+posy=157.195
+road= 37 B
+road= 39 G
+road= 40 G
+road= 41 B
+
+town=38
+name=Берегов
+type=1
+posx=30.169
+posy=146.014
+road= 38 G
+
+town=39
+name=Сгущево
+type=0
+posx=77.592
+posy=170.249
+road= 38 G
+road= 41 B
+road= 98 G
+
+town=40
+name=Юрово
+type=0
+posx=59.871
+posy=195.097
+road= 38 B
+road= 40 B
+road= 42 B
+
+town=41
+name=Жуково
+type=0
+posx=63.143
+posy=230.304
+road= 41 B
+road= 43 B
+road= 44 B
+road= 101 B
+
+town=42
+name=Озёрск
+type=0
+posx=63.528
+posy=259.111
+road= 42 B
+road= 44 B
+road= 46 B
+
+town=43
+name=Рулевое
+type=0
+posx=41.111
+posy=243.799
+road= 42 B
+road= 43 B
+road= 45 B
+
+town=44
+name=Явинск
+type=1
+posx=23.156
+posy=232.783
+road= 44 B
+
+town=45
+name=Летинск
+type=1
+posx=82.696
+posy=280.04
+road= 43 B
+road= 47 G
+road= 56 B
+road= 82 B
+road= 83 G
+
+town=46
+name=Близкий
+type=0
+posx=65.754
+posy=288.609
+road= 46 G
+road= 48 G
+
+town=47
+name=Ямкино
+type=0
+posx=50.112
+posy=299.239
+road= 47 G
+road= 50 G
+road= 56 B
+
+town=48
+name=Раково
+type=0
+posx=17.064
+posy=284.533
+road= 50 B
+
+town=49
+name=Лобово
+type=0
+posx=37.278
+posy=311.081
+road= 48 G
+road= 49 B
+road= 51 G
+
+town=50
+name=Холминск
+type=1
+posx=29.127
+posy=327.329
+road= 50 G
+road= 52 B
+
+town=51
+name=Старохолминск
+type=0
+posx=28.851
+posy=343.082
+road= 51 B
+road= 53 B
+
+town=52
+name=Егорово
+type=0
+posx=36.507
+posy=358.614
+road= 52 B
+road= 54 B
+road= 55 B
+
+town=53
+name=Забугорный
+type=0
+posx=49.12
+posy=373.485
+road= 53 B
+
+town=54
+name=Мехонское
+type=0
+posx=62.229
+posy=349.636
+road= 53 B
+road= 56 B
+
+town=55
+name=Тучково
+type=0
+posx=76.99
+posy=315.267
+road= 46 B
+road= 48 B
+road= 55 B
+road= 57 B
+
+town=56
+name=Северный
+type=0
+posx=114.612
+posy=340.271
+road= 56 B
+road= 58 B
+
+town=57
+name=Огурцово
+type=0
+posx=166.256
+posy=324.614
+road= 8 B
+road= 9 B
+road= 57 B
+road= 82 B
+
+town=58
+name=Глебово
+type=0
+posx=203.158
+posy=300.049
+road= 9 G
+road= 60 G
+road= 61 B
+road= 80 b
+
+town=59
+name=Окружной
+type=1
+posx=203.431
+posy=279.875
+road= 59 G
+road= 61 B
+road= 79 G
+road= 80 B
+
+town=60
+name=Строгино
+type=0
+posx=229.483
+posy=275.303
+road= 10 B
+road= 59 B
+road= 60 B
+road= 62 B
+road= 77 B
+road= 79 B
+
+town=61
+name=Гадовск
+type=1
+posx=256.857
+posy=267.867
+road= 61 B
+road= 63 G
+road= 76 B
+road= 77 G
+
+town=62
+name=Гадово
+type=0
+posx=278.044
+posy=280.953
+road= 62 G
+road= 64 G
+
+town=63
+name=Торгашино
+type=0
+posx=298.881
+posy=293.845
+road= 11 B
+road= 12 G
+road= 63 G
+road= 65 B
+
+town=64
+name=Волково
+type=0
+posx=341.255
+posy=278.266
+road= 12 B
+road= 17 B
+road= 64 B
+road= 66 B
+
+town=65
+name=Щукино
+type=0
+posx=326.377
+posy=238.619
+road= 65 B
+road= 67 B
+road= 74 B
+
+town=66
+name=Ильюшин
+type=1
+posx=330.116
+posy=206.682
+road= 21 G
+road= 66 B
+road= 68 B
+road= 74 G
+
+town=67
+name=Ярки
+type=0
+posx=295.673
+posy=184.653
+road= 67 B
+road= 69 B
+road= 73 B
+road= 74 B
+
+town=68
+name=Хард
+type=0
+posx=320.037
+posy=155.459
+road= 68 B
+road= 70 B
+road= 71 B
+
+town=69
+name=Ушаково
+type=0
+posx=351.583
+posy=147.981
+road= 22 B
+road= 23 B
+road= 24 B
+road= 69 B
+
+town=70
+name=Кротово
+type=0
+posx=278.238
+posy=134.251
+road= 31 G
+road= 69 B
+road= 72 G
+road= 91 B
+
+town=71
+name=Малиновск
+type=1
+posx=251.801
+posy=164.324
+road= 71 G
+road= 73 B
+road= 89 G
+road= 90 B
+
+town=72
+name=Пятково
+type=0
+posx=267.535
+posy=188.782
+road= 68 B
+road= 72 B
+road= 74 B
+road= 75 B
+road= 89 B
+
+town=73
+name=Металл
+type=0
+posx=301.574
+posy=210.979
+road= 66 B
+road= 67 G
+road= 68 B
+road= 73 B
+road= 75 G
+road= 76 B
+
+town=74
+name=Танковск
+type=1
+posx=275.869
+posy=213.549
+road= 73 B
+road= 74 G
+road= 76 B
+road= 77 G
+road= 89 G
+
+town=75
+name=Полигон
+type=0
+posx=270.728
+posy=241.201
+road= 62 B
+road= 74 B
+road= 75 B
+road= 77 B
+
+town=76
+name=Скрипов
+type=0
+posx=231.47
+posy=230.958
+road= 61 B
+road= 62 G
+road= 75 G
+road= 76 B
+road= 78 G
+road= 79 B
+road= 89 G
+
+town=77
+name=Междуречье
+type=2
+posx=199.083
+posy=222.476
+road= 77 G
+road= 79 G
+road= 86 G
+road= 87 G
+road= 88 G
+road= 89 G
+
+town=78
+name=Панино
+type=0
+posx=201.81
+posy=253.711
+road= 60 G
+road= 61 B
+road= 77 B
+road= 78 G
+road= 80 B
+road= 86 B
+
+town=79
+name=Краево
+type=0
+posx=179.613
+posy=278.166
+road= 59 B
+road= 60 B
+road= 79 B
+road= 81 B
+road= 86 B
+
+town=80
+name=Лаптево
+type=0
+posx=158.408
+posy=271.887
+road= 80 B
+road= 82 B
+road= 85 B
+road= 86 B
+
+town=81
+name=Развилка
+type=0
+posx=133.071
+posy=295.241
+road= 46 B
+road= 58 B
+road= 81 B
+road= 84 B
+
+town=82
+name=Нагорный
+type=0
+posx=98.978
+posy=271.612
+road= 46 G
+road= 84 G
+
+town=83
+name=Подлунный
+type=0
+posx=115.006
+posy=266.159
+road= 82 B
+road= 83 G
+road= 85 G
+road= 101 B
+
+town=84
+name=Железовск
+type=1
+posx=135.803
+posy=256.812
+road= 81 B
+road= 84 G
+road= 86 G
+road= 102 B
+
+town=85
+name=Симоново
+type=0
+posx=167.895
+posy=244.271
+road= 78 G
+road= 79 B
+road= 80 B
+road= 81 B
+road= 85 G
+road= 87 B
+road= 102 B
+
+town=86
+name=Львово
+type=0
+posx=166.571
+posy=215.061
+road= 78 G
+road= 86 B
+road= 88 B
+road= 100 G
+road= 102 B
+road= 103 B
+
+town=87
+name=Рогозово
+type=0
+posx=193.615
+posy=195.949
+road= 78 G
+road= 87 B
+road= 89 B
+road= 90 B
+road= 103 B
+road= 104 G
+
+town=88
+name=Болотный
+type=0
+posx=226.485
+posy=201.869
+road= 72 G
+road= 73 B
+road= 75 G
+road= 77 G
+road= 78 G
+road= 88 B
+road= 90 B
+
+town=89
+name=Зарёв
+type=0
+posx=220.206
+posy=162.653
+road= 72 B
+road= 88 B
+road= 89 B
+road= 91 B
+road= 104 B
+road= 106 B
+
+town=90
+name=Сыровск
+type=0
+posx=235.551
+posy=133.053
+road= 32 B
+road= 71 B
+road= 90 B
+road= 106 B
+
+town=91
+name=Токарев
+type=0
+posx=193.912
+posy=110.581
+road= 33 B
+road= 106 B
+
+town=92
+name=Охотино
+type=0
+posx=113.277
+posy=99.125
+road= 35 B
+road= 36 G
+road= 94 G
+
+town=93
+name=Ейск
+type=0
+posx=128.974
+posy=109.48
+road= 93 G
+road= 95 G
+road= 96 B
+
+town=94
+name=Осоков
+type=1
+posx=144.163
+posy=122.721
+road= 94 G
+road= 96 B
+road= 105 G
+
+town=95
+name=Грибной
+type=0
+posx=110.669
+posy=129.187
+road= 36 B
+road= 37 B
+road= 94 B
+road= 95 B
+road= 97 B
+
+town=96
+name=Сухово
+type=0
+posx=132.947
+posy=160.344
+road= 96 B
+road= 98 B
+road= 103 B
+road= 105 B
+
+town=97
+name=Макаров
+type=1
+posx=99.844
+posy=182.375
+road= 40 G
+road= 97 B
+road= 99 G
+
+town=98
+name=Дедово
+type=0
+posx=118.681
+posy=194.823
+road= 98 G
+road= 100 G
+
+town=99
+name=Скотинск
+type=1
+posx=136.83
+posy=206.507
+road= 87 G
+road= 99 G
+road= 101 B
+road= 102 B
+road= 103 B
+
+town=100
+name=Корнево
+type=0
+posx=106.997
+posy=238.989
+road= 42 B
+road= 84 B
+road= 100 B
+road= 102 B
+
+town=101
+name=Зайцево
+type=0
+posx=133.403
+posy=235.328
+road= 85 B
+road= 86 B
+road= 87 B
+road= 100 B
+road= 101 B
+
+town=102
+name=Водный
+type=0
+posx=157.968
+posy=184.875
+road= 87 B
+road= 88 B
+road= 97 B
+road= 100 B
+road= 104 B
+
+town=103
+name=Слепнинск
+type=1
+posx=184.997
+posy=170.777
+road= 88 G
+road= 90 B
+road= 103 B
+road= 105 G
+
+town=104
+name=Змеево
+type=0
+posx=166.069
+posy=146.24
+road= 95 G
+road= 97 B
+road= 104 G
+road= 106 B
+
+town=105
+name=Обломово
+type=0
+posx=196.837
+posy=139.386
+road= 90 B
+road= 91 B
+road= 92 B
+road= 105 B
