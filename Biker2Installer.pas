@@ -19,7 +19,7 @@
 uses System;
 
 const
-  version: record Major, Minor, Build: integer; end = (Major: 0; Minor: 9; Build: 34);
+  version: record Major, Minor, Build: integer; end = (Major: 0; Minor: 9; Build: 35);
   LANGS = 2;
   
 type

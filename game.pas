@@ -12,7 +12,7 @@ const
   ///1) Изменить значения констаты версии
   ///2) Создать совместимость в v_compatibility, если это необходимо
   ///3) Копировать константу в установщик
-  version: record Major, Minor, Build: integer; end = (Major: 0; Minor: 9; Build: 34);
+  version: record Major, Minor, Build: integer; end = (Major: 0; Minor: 9; Build: 35);
   TEST = true;
   biker_name = 'Biker 2';
   questcount = 2;
@@ -1028,7 +1028,7 @@ type
   TBalance = record
     maxtutorial, int_minx, int_miny, int_maxx, int_maxy, minnicksize, maxnicksize, minspeedong, minspeedonb,
     animminspeed, animmaxspeed, animKFspeed, animKFseconds, nighthourstart, nighthourfinish, criticalhp,
-    cameraveight, needleveight, apartmentprice0, apartmentprice1, apartmentprice2, maxwritespd, minwritespd: integer;
+    cameraveight, needleveight, apartmentprice0, apartmentprice1, apartmentprice2, maxwritespd, minwritespd, distancebetweenroadbonuses: integer;
         
     wateronmeter, foodonmeter, night0, night1, minimaleff, subaverage, foodprice, waterprice, mv_minsc, mv_maxsc, mvminstep, mvmaxstep: real;
     
@@ -4252,221 +4252,268 @@ var
   ///Возвращает расстояние между лвумя городами
   function distance(map1, map2: TMap): real := distance(map1.x,map1.y,map2.x,map2.y);
 
-  ///Возвращает стоимость километра в энергии по типу дорог c
-  function energycost(c: char): real;
-  begin
-    var g,b: real;
-    g:=balance.bk.mincostG;b:=balance.bk.mincostB;
-    if c='g' then
-    case player.bike.frame.material of
-      0: g:=g+(g*balance.bk.frame.material.steel.roadg);
-      1: g:=g+(g*balance.bk.frame.material.steelplus.roadg);
-      2: g:=g+(g*balance.bk.frame.material.alu6061.roadg);
-      3: g:=g+(g*balance.bk.frame.material.alu7075.roadg);
-      4: g:=g+(g*balance.bk.frame.material.titan.roadg);
-    end;
-    if c='b' then
-    case player.bike.frame.material of
-      0: b:=b+(b*balance.bk.frame.material.steel.roadb);
-      1: b:=b+(b*balance.bk.frame.material.steelplus.roadb);
-      2: b:=b+(b*balance.bk.frame.material.alu6061.roadb);
-      3: b:=b+(b*balance.bk.frame.material.alu7075.roadb);
-      4: b:=b+(b*balance.bk.frame.material.titan.roadb);
-    end;
-    if player.bike.frame.hitpoints/player.bike.frame.maxhitpoints>=balance.bk.frame.hp.average then
+type
+  EnergyCosts = static class
+    public static function GetCBFrame(c: char): real;
     begin
-      if c='g' then g:=g+(g*(balance.bk.frame.hp.maximum*((player.bike.frame.hitpoints/player.bike.frame.maxhitpoints)-balance.bk.frame.hp.average)));
-      if c='b' then b:=b+(b*(balance.bk.frame.hp.maximum*((player.bike.frame.hitpoints/player.bike.frame.maxhitpoints)-balance.bk.frame.hp.average)));
-    end
-    else
-    begin
-      if c='g' then g:=g+(g*(balance.bk.frame.hp.minimal*(balance.bk.frame.hp.average-(player.bike.frame.hitpoints/player.bike.frame.maxhitpoints))));
-      if c='b' then b:=b+(b*(balance.bk.frame.hp.minimal*(balance.bk.frame.hp.average-(player.bike.frame.hitpoints/player.bike.frame.maxhitpoints))));
-    end;
-    if player.bike.fork.suspensionflag then
-    begin
-      if c='g' then g:=g+(g*balance.bk.fork.suspension.flag1.roadg);
-      if c='b' then b:=b+(b*balance.bk.fork.suspension.flag1.roadb);
-    end
-    else
-    begin
-      if c='g' then g:=g+(g*balance.bk.fork.suspension.flag0.roadg);
-      if c='b' then b:=b+(b*balance.bk.fork.suspension.flag0.roadb);
-    end;
-    if player.bike.fork.suspensionflag then
-    begin
-      if player.bike.fork.blocks then
+      if c = 'g' then
+      case player.bike.frame.material of
+        0: Result += balance.bk.frame.material.steel.roadg;
+        1: Result += balance.bk.frame.material.steelplus.roadg;
+        2: Result += balance.bk.frame.material.alu6061.roadg;
+        3: Result += balance.bk.frame.material.alu7075.roadg;
+        4: Result += balance.bk.frame.material.titan.roadg;
+      end;
+      if c = 'b' then
+      case player.bike.frame.material of
+        0: Result += balance.bk.frame.material.steel.roadb;
+        1: Result += balance.bk.frame.material.steelplus.roadb;
+        2: Result += balance.bk.frame.material.alu6061.roadb;
+        3: Result += balance.bk.frame.material.alu7075.roadb;
+        4: Result += balance.bk.frame.material.titan.roadb;
+      end;
+      if player.bike.frame.hitpoints/player.bike.frame.maxhitpoints >= balance.bk.frame.hp.average then
       begin
-        if c='g' then g:=g+(g*balance.bk.fork.block.roadg);
-        if c='b' then b:=b+(b*balance.bk.fork.block.roadb);
-      end;
-      if c='g' then
-      case player.bike.fork.suspension of
-        0: g:=g+(g*balance.bk.fork.suspension.steel.roadg);
-        1: g:=g+(g*balance.bk.fork.suspension.steelplus.roadg);
-        2: g:=g+(g*balance.bk.fork.suspension.pneumatic.roadg);
-        3: g:=g+(g*balance.bk.fork.suspension.oil.roadg);
-        4: g:=g+(g*balance.bk.fork.suspension.oilplus.roadg);
-        5: g:=g+(g*balance.bk.fork.suspension.pneumaticplus.roadg);
-      end;
-      if (not (player.bike.fork.blocks)) then
-      begin
-        if c='b' then
-        case player.bike.fork.suspension of
-          0: b:=b+(b*balance.bk.fork.suspension.steel.roadb);
-          1: b:=b+(b*balance.bk.fork.suspension.steelplus.roadb);
-          2: b:=b+(b*balance.bk.fork.suspension.pneumatic.roadb);
-          3: b:=b+(b*balance.bk.fork.suspension.oil.roadb);
-          4: b:=b+(b*balance.bk.fork.suspension.oilplus.roadb);
-          5: b:=b+(b*balance.bk.fork.suspension.pneumaticplus.roadb);
-        end;
-        if (player.bike.fork.travel>0) and (player.bike.fork.travel<balance.bk.fork.susptravel1.max) then
-        begin
-          if c='b' then b:=b+(b*(player.bike.fork.travel*balance.bk.fork.susptravel1.value));
-        end;
-        if (player.bike.fork.travel>=balance.bk.fork.susptravel2.min) and (player.bike.fork.travel<balance.bk.fork.susptravel2.max) then
-        begin
-          if c='b' then b:=b+(b*(((player.bike.fork.travel-balance.bk.fork.susptravel2.min)*balance.bk.fork.susptravel2.value)+(balance.bk.fork.susptravel1.max*balance.bk.fork.susptravel1.value)));
-        end;
-        if (player.bike.fork.travel>=balance.bk.fork.susptravel3.min){ and (player.bike.fork.travel<=balance.bk.fork.susptravel3.max)} then
-        begin
-          if c='b' then b:=b+(b*(((player.bike.fork.travel-balance.bk.fork.susptravel3.min)*balance.bk.fork.susptravel3.value)+(balance.bk.fork.susptravel1.max*balance.bk.fork.susptravel1.value)+((balance.bk.fork.susptravel2.max-balance.bk.fork.susptravel2.min)*balance.bk.fork.susptravel2.value)));
-        end;
-      end;
-    end;
-    if player.bike.fork.hitpoints/player.bike.fork.maxhitpoints>=balance.bk.fork.hp.average then
-    begin
-      if c='g' then g:=g+(g*(balance.bk.fork.hp.maximum*((player.bike.fork.hitpoints/player.bike.fork.maxhitpoints)-balance.bk.fork.hp.average)));
-      if c='b' then b:=b+(b*(balance.bk.fork.hp.maximum*((player.bike.fork.hitpoints/player.bike.fork.maxhitpoints)-balance.bk.fork.hp.average)));
-    end
-    else
-    begin
-      if c='g' then g:=g+(g*(balance.bk.fork.hp.minimal*(balance.bk.fork.hp.average-(player.bike.fork.hitpoints/player.bike.fork.maxhitpoints))));
-      if c='b' then b:=b+(b*(balance.bk.fork.hp.minimal*(balance.bk.fork.hp.average-(player.bike.fork.hitpoints/player.bike.fork.maxhitpoints))));
-    end;
-    if player.bike.bsusp.flag then
-    begin
-      if c='g' then g:=g+(g*balance.bk.bsusp.suspension.flag0.roadg);
-      if c='b' then b:=b+(b*balance.bk.bsusp.suspension.flag0.roadb);
-    end
-    else
-    begin
-      if c='g' then g:=g+(g*balance.bk.bsusp.suspension.flag1.roadg);
-      if c='b' then b:=b+(b*balance.bk.bsusp.suspension.flag1.roadb);
-    end;
-    if player.bike.frame.suspensionflag then
-    if player.bike.bsusp.flag then
-    begin
-      if player.bike.bsusp.blocks then
-      begin
-        if c='g' then g:=g+(g*balance.bk.bsusp.block.roadg);
-        if c='b' then b:=b+(b*balance.bk.bsusp.block.roadb);
-      end;
-      if c='g' then
-      case player.bike.bsusp.suspension of
-        0: g:=g+(g*balance.bk.bsusp.suspension.steel.roadg);
-        1: g:=g+(g*balance.bk.bsusp.suspension.steelplus.roadg);
-        2: g:=g+(g*balance.bk.bsusp.suspension.pneumatic.roadg);
-        3: g:=g+(g*balance.bk.bsusp.suspension.oil.roadg);
-        4: g:=g+(g*balance.bk.bsusp.suspension.pneumaticplus.roadg);
-      end;
-      if (not (player.bike.bsusp.blocks)) then
-      begin
-        if c='b' then
-        case player.bike.bsusp.suspension of
-          0: b:=b+(b*balance.bk.bsusp.suspension.steel.roadb);
-          1: b:=b+(b*balance.bk.bsusp.suspension.steelplus.roadb);
-          2: b:=b+(b*balance.bk.bsusp.suspension.pneumatic.roadb);
-          3: b:=b+(b*balance.bk.bsusp.suspension.oil.roadb);
-          4: b:=b+(b*balance.bk.bsusp.suspension.pneumaticplus.roadb);
-        end;
-        if (player.bike.bsusp.travel>0) and (player.bike.bsusp.travel<balance.bk.bsusp.susptravel1.max) then
-        begin
-          if c='b' then b:=b+(b*(player.bike.bsusp.travel*balance.bk.bsusp.susptravel1.value));
-        end;
-        if (player.bike.bsusp.travel>=balance.bk.bsusp.susptravel2.min) and (player.bike.bsusp.travel<balance.bk.bsusp.susptravel2.max) then
-        begin
-          if c='b' then b:=b+(b*(((player.bike.bsusp.travel-balance.bk.bsusp.susptravel2.min)*balance.bk.bsusp.susptravel2.value)+(balance.bk.bsusp.susptravel1.max*balance.bk.bsusp.susptravel1.value)));
-        end;
-        if (player.bike.bsusp.travel>=balance.bk.bsusp.susptravel3.min){ and (player.bike.bsusp.travel<=balance.bk.bsusp.susptravel3.max) }then
-        begin
-          if c='b' then b:=b+(b*(((player.bike.bsusp.travel-balance.bk.bsusp.susptravel3.min)*balance.bk.bsusp.susptravel3.value)+(balance.bk.bsusp.susptravel1.max*balance.bk.bsusp.susptravel1.value)+((balance.bk.bsusp.susptravel2.max-balance.bk.bsusp.susptravel2.min)*balance.bk.bsusp.susptravel2.value)));
-        end;
-      end;
-      if player.bike.bsusp.hitpoints/player.bike.bsusp.maxhitpoints>=balance.bk.bsusp.hp.average then
-      begin
-        if c='g' then g:=g+(g*(balance.bk.bsusp.hp.maximum*((player.bike.bsusp.hitpoints/player.bike.bsusp.maxhitpoints)-balance.bk.bsusp.hp.average)));
-        if c='b' then b:=b+(b*(balance.bk.bsusp.hp.maximum*((player.bike.bsusp.hitpoints/player.bike.bsusp.maxhitpoints)-balance.bk.bsusp.hp.average)));
+        if c='g' then Result += (balance.bk.frame.hp.maximum*((player.bike.frame.hitpoints/player.bike.frame.maxhitpoints)-balance.bk.frame.hp.average));
+        if c='b' then Result += (balance.bk.frame.hp.maximum*((player.bike.frame.hitpoints/player.bike.frame.maxhitpoints)-balance.bk.frame.hp.average));
       end
       else
       begin
-        if c='g' then g:=g+(g*(balance.bk.bsusp.hp.minimal*(balance.bk.bsusp.hp.average-(player.bike.bsusp.hitpoints/player.bike.bsusp.maxhitpoints))));
-        if c='b' then b:=b+(b*(balance.bk.bsusp.hp.minimal*(balance.bk.bsusp.hp.average-(player.bike.bsusp.hitpoints/player.bike.bsusp.maxhitpoints))));
+        if c='g' then Result += (balance.bk.frame.hp.minimal*(balance.bk.frame.hp.average-(player.bike.frame.hitpoints/player.bike.frame.maxhitpoints)));
+        if c='b' then Result += (balance.bk.frame.hp.minimal*(balance.bk.frame.hp.average-(player.bike.frame.hitpoints/player.bike.frame.maxhitpoints)));
       end;
     end;
-    if player.bike.transmission.count<6 then
+    public static function GetCBFork(c: char): real;
     begin
-      if c='g' then g:=g+(g*balance.bk.transmission.backs0.roadG);
-      if c='b' then b:=b+(b*balance.bk.transmission.backs0.roadb);
+      if player.bike.fork.suspensionflag then
+      begin
+        if c='g' then Result += balance.bk.fork.suspension.flag1.roadg;
+        if c='b' then Result += balance.bk.fork.suspension.flag1.roadb;
+      end
+      else
+      begin
+        if c='g' then Result += balance.bk.fork.suspension.flag0.roadg;
+        if c='b' then Result += balance.bk.fork.suspension.flag0.roadb;
+      end;
+      if player.bike.fork.suspensionflag then
+      begin
+        if player.bike.fork.blocks then
+        begin
+          if c='g' then Result += balance.bk.fork.block.roadg;
+          if c='b' then Result += balance.bk.fork.block.roadb;
+        end;
+        if c='g' then
+        case player.bike.fork.suspension of
+          0: Result += balance.bk.fork.suspension.steel.roadg;
+          1: Result += balance.bk.fork.suspension.steelplus.roadg;
+          2: Result += balance.bk.fork.suspension.pneumatic.roadg;
+          3: Result += balance.bk.fork.suspension.oil.roadg;
+          4: Result += balance.bk.fork.suspension.oilplus.roadg;
+          5: Result += balance.bk.fork.suspension.pneumaticplus.roadg;
+        end;
+        if (not (player.bike.fork.blocks)) then
+        begin
+          if c='b' then
+          case player.bike.fork.suspension of
+            0: Result += balance.bk.fork.suspension.steel.roadb;
+            1: Result += balance.bk.fork.suspension.steelplus.roadb;
+            2: Result += balance.bk.fork.suspension.pneumatic.roadb;
+            3: Result += balance.bk.fork.suspension.oil.roadb;
+            4: Result += balance.bk.fork.suspension.oilplus.roadb;
+            5: Result += balance.bk.fork.suspension.pneumaticplus.roadb;
+          end;
+          if (player.bike.fork.travel>0) and (player.bike.fork.travel<balance.bk.fork.susptravel1.max) then
+          begin
+            if c='b' then Result += player.bike.fork.travel*balance.bk.fork.susptravel1.value;
+          end;
+          if (player.bike.fork.travel>=balance.bk.fork.susptravel2.min) and (player.bike.fork.travel<balance.bk.fork.susptravel2.max) then
+          begin
+            if c='b' then Result += (((player.bike.fork.travel-balance.bk.fork.susptravel2.min)*balance.bk.fork.susptravel2.value)+(balance.bk.fork.susptravel1.max*balance.bk.fork.susptravel1.value));
+          end;
+          if (player.bike.fork.travel>=balance.bk.fork.susptravel3.min){ and (player.bike.fork.travel<=balance.bk.fork.susptravel3.max)} then
+          begin
+            if c='b' then Result += (((player.bike.fork.travel-balance.bk.fork.susptravel3.min)*balance.bk.fork.susptravel3.value)+(balance.bk.fork.susptravel1.max*balance.bk.fork.susptravel1.value)+((balance.bk.fork.susptravel2.max-balance.bk.fork.susptravel2.min)*balance.bk.fork.susptravel2.value));
+          end;
+        end;
+      end;
+      if player.bike.fork.hitpoints/player.bike.fork.maxhitpoints>=balance.bk.fork.hp.average then
+      begin
+        if c='g' then Result += (balance.bk.fork.hp.maximum*((player.bike.fork.hitpoints/player.bike.fork.maxhitpoints)-balance.bk.fork.hp.average));
+        if c='b' then Result += (balance.bk.fork.hp.maximum*((player.bike.fork.hitpoints/player.bike.fork.maxhitpoints)-balance.bk.fork.hp.average));
+      end
+      else
+      begin
+        if c='g' then Result += (balance.bk.fork.hp.minimal*(balance.bk.fork.hp.average-(player.bike.fork.hitpoints/player.bike.fork.maxhitpoints)));
+        if c='b' then Result += (balance.bk.fork.hp.minimal*(balance.bk.fork.hp.average-(player.bike.fork.hitpoints/player.bike.fork.maxhitpoints)));
+      end;
     end;
-    if player.bike.transmission.count>=6 then
+    public static function GetCBBack(c: char): real;
     begin
-      if c='g' then g:=g+(g*balance.bk.transmission.backs1.roadG);
-      if c='b' then b:=b+(b*balance.bk.transmission.backs1.roadb);
+      if player.bike.bsusp.flag then
+      begin
+        if c='g' then Result += balance.bk.bsusp.suspension.flag0.roadg;
+        if c='b' then Result += balance.bk.bsusp.suspension.flag0.roadb;
+      end
+      else
+      begin
+        if c='g' then Result += balance.bk.bsusp.suspension.flag1.roadg;
+        if c='b' then Result += balance.bk.bsusp.suspension.flag1.roadb;
+      end;
+      if player.bike.frame.suspensionflag then
+      if player.bike.bsusp.flag then
+      begin
+        if player.bike.bsusp.blocks then
+        begin
+          if c='g' then Result += balance.bk.bsusp.block.roadg;
+          if c='b' then Result += balance.bk.bsusp.block.roadb;
+        end;
+        if c='g' then
+        case player.bike.bsusp.suspension of
+          0: Result += balance.bk.bsusp.suspension.steel.roadg;
+          1: Result += balance.bk.bsusp.suspension.steelplus.roadg;
+          2: Result += balance.bk.bsusp.suspension.pneumatic.roadg;
+          3: Result += balance.bk.bsusp.suspension.oil.roadg;
+          4: Result += balance.bk.bsusp.suspension.pneumaticplus.roadg;
+        end;
+        if (not (player.bike.bsusp.blocks)) then
+        begin
+          if c='b' then
+          case player.bike.bsusp.suspension of
+            0: Result += balance.bk.bsusp.suspension.steel.roadb;
+            1: Result += balance.bk.bsusp.suspension.steelplus.roadb;
+            2: Result += balance.bk.bsusp.suspension.pneumatic.roadb;
+            3: Result += balance.bk.bsusp.suspension.oil.roadb;
+            4: Result += balance.bk.bsusp.suspension.pneumaticplus.roadb;
+          end;
+          if (player.bike.bsusp.travel>0) and (player.bike.bsusp.travel<balance.bk.bsusp.susptravel1.max) then
+          begin
+            if c='b' then Result += player.bike.bsusp.travel*balance.bk.bsusp.susptravel1.value;
+          end;
+          if (player.bike.bsusp.travel>=balance.bk.bsusp.susptravel2.min) and (player.bike.bsusp.travel<balance.bk.bsusp.susptravel2.max) then
+          begin
+            if c='b' then Result += ((player.bike.bsusp.travel-balance.bk.bsusp.susptravel2.min)*balance.bk.bsusp.susptravel2.value)+(balance.bk.bsusp.susptravel1.max*balance.bk.bsusp.susptravel1.value);
+          end;
+          if (player.bike.bsusp.travel>=balance.bk.bsusp.susptravel3.min) then
+          begin
+            if c='b' then Result += ((player.bike.bsusp.travel-balance.bk.bsusp.susptravel3.min)*balance.bk.bsusp.susptravel3.value)+(balance.bk.bsusp.susptravel1.max*balance.bk.bsusp.susptravel1.value)+((balance.bk.bsusp.susptravel2.max-balance.bk.bsusp.susptravel2.min)*balance.bk.bsusp.susptravel2.value);
+          end;
+        end;
+        if player.bike.bsusp.hitpoints/player.bike.bsusp.maxhitpoints>=balance.bk.bsusp.hp.average then
+        begin
+          if c='g' then Result += balance.bk.bsusp.hp.maximum*((player.bike.bsusp.hitpoints/player.bike.bsusp.maxhitpoints)-balance.bk.bsusp.hp.average);
+          if c='b' then Result += balance.bk.bsusp.hp.maximum*((player.bike.bsusp.hitpoints/player.bike.bsusp.maxhitpoints)-balance.bk.bsusp.hp.average);
+        end
+        else
+        begin
+          if c='g' then Result += balance.bk.bsusp.hp.minimal*(balance.bk.bsusp.hp.average-(player.bike.bsusp.hitpoints/player.bike.bsusp.maxhitpoints));
+          if c='b' then Result += balance.bk.bsusp.hp.minimal*(balance.bk.bsusp.hp.average-(player.bike.bsusp.hitpoints/player.bike.bsusp.maxhitpoints));
+        end;
+      end;
     end;
-    if player.bike.transmission.fores then
+    public static function GetCBTransmission(c: char): real;
     begin
-      if c='g' then g:=g+(g*balance.bk.transmission.fores1.roadG);
-      if c='b' then b:=b+(b*balance.bk.transmission.fores1.roadB);
-    end
-    else
-    begin
-      if c='g' then g:=g+(g*balance.bk.transmission.fores0.roadG);
-      if c='b' then b:=b+(b*balance.bk.transmission.fores0.roadB);
+      if player.bike.transmission.count<6 then
+      begin
+        if c='g' then Result += balance.bk.transmission.backs0.roadG;
+        if c='b' then Result += balance.bk.transmission.backs0.roadb;
+      end;
+      if player.bike.transmission.count>=6 then
+      begin
+        if c='g' then Result += balance.bk.transmission.backs1.roadG;
+        if c='b' then Result += balance.bk.transmission.backs1.roadb;
+      end;
+      if player.bike.transmission.fores then
+      begin
+        if c='g' then Result += balance.bk.transmission.fores1.roadG;
+        if c='b' then Result += balance.bk.transmission.fores1.roadB;
+      end
+      else
+      begin
+        if c='g' then Result += balance.bk.transmission.fores0.roadG;
+        if c='b' then Result += balance.bk.transmission.fores0.roadB;
+      end;
+      if player.bike.transmission.hitpoints/player.bike.transmission.maxhitpoints>=balance.bk.transmission.hp.average then
+      begin
+        if c='g' then Result += balance.bk.transmission.hp.maximum*((player.bike.transmission.hitpoints/player.bike.transmission.maxhitpoints)-balance.bk.transmission.hp.average);
+        if c='b' then Result += balance.bk.transmission.hp.maximum*((player.bike.transmission.hitpoints/player.bike.transmission.maxhitpoints)-balance.bk.transmission.hp.average);
+      end
+      else
+      begin
+        if c='g' then Result += balance.bk.transmission.hp.minimal*(balance.bk.transmission.hp.average-(player.bike.transmission.hitpoints/player.bike.transmission.maxhitpoints));
+        if c='b' then Result += balance.bk.transmission.hp.minimal*(balance.bk.transmission.hp.average-(player.bike.transmission.hitpoints/player.bike.transmission.maxhitpoints));
+      end;
     end;
-    if player.bike.transmission.hitpoints/player.bike.transmission.maxhitpoints>=balance.bk.transmission.hp.average then
+    public static function GetCBRudder(c: char): real;
     begin
-      if c='g' then g:=g+(g*(balance.bk.transmission.hp.maximum*((player.bike.transmission.hitpoints/player.bike.transmission.maxhitpoints)-balance.bk.transmission.hp.average)));
-      if c='b' then b:=b+(b*(balance.bk.transmission.hp.maximum*((player.bike.transmission.hitpoints/player.bike.transmission.maxhitpoints)-balance.bk.transmission.hp.average)));
-    end
-    else
-    begin
-      if c='g' then g:=g+(g*(balance.bk.transmission.hp.minimal*(balance.bk.transmission.hp.average-(player.bike.transmission.hitpoints/player.bike.transmission.maxhitpoints))));
-      if c='b' then b:=b+(b*(balance.bk.transmission.hp.minimal*(balance.bk.transmission.hp.average-(player.bike.transmission.hitpoints/player.bike.transmission.maxhitpoints))));
+      if player.bike.rudder.hitpoints/player.bike.rudder.maxhitpoints>=balance.bk.rudder.hp.average then
+      begin
+        if c='g' then Result += balance.bk.rudder.hp.maximum*((player.bike.rudder.hitpoints/player.bike.rudder.maxhitpoints)-balance.bk.rudder.hp.average);
+        if c='b' then Result += balance.bk.rudder.hp.maximum*((player.bike.rudder.hitpoints/player.bike.rudder.maxhitpoints)-balance.bk.rudder.hp.average);
+      end
+      else
+      begin
+        if c='g' then Result += balance.bk.rudder.hp.minimal*(balance.bk.rudder.hp.average-(player.bike.rudder.hitpoints/player.bike.rudder.maxhitpoints));
+        if c='b' then Result += balance.bk.rudder.hp.minimal*(balance.bk.rudder.hp.average-(player.bike.rudder.hitpoints/player.bike.rudder.maxhitpoints));
+      end;
     end;
-    if player.bike.rudder.hitpoints/player.bike.rudder.maxhitpoints>=balance.bk.rudder.hp.average then
+    public static function GetCBBackWheel(c: char): real;
     begin
-      if c='g' then g:=g+(g*(balance.bk.rudder.hp.maximum*((player.bike.rudder.hitpoints/player.bike.rudder.maxhitpoints)-balance.bk.rudder.hp.average)));
-      if c='b' then b:=b+(b*(balance.bk.rudder.hp.maximum*((player.bike.rudder.hitpoints/player.bike.rudder.maxhitpoints)-balance.bk.rudder.hp.average)));
-    end
-    else
-    begin
-      if c='g' then g:=g+(g*(balance.bk.rudder.hp.minimal*(balance.bk.rudder.hp.average-(player.bike.rudder.hitpoints/player.bike.rudder.maxhitpoints))));
-      if c='b' then b:=b+(b*(balance.bk.rudder.hp.minimal*(balance.bk.rudder.hp.average-(player.bike.rudder.hitpoints/player.bike.rudder.maxhitpoints))));
+      if player.bike.backwheel.pressure>=balance.bk.wheel.pressure.average then
+      begin
+        if c='g' then Result += (player.bike.backwheel.pressure-balance.bk.wheel.pressure.average)*balance.bk.wheel.pressure.maximumG;
+        if c='b' then Result += (player.bike.backwheel.pressure-balance.bk.wheel.pressure.average)*balance.bk.wheel.pressure.maximumB;
+      end
+      else
+      begin
+        if c='g' then Result += (balance.bk.wheel.pressure.average-player.bike.backwheel.pressure)*balance.bk.wheel.pressure.minimumG;
+        if c='b' then Result += (balance.bk.wheel.pressure.average-player.bike.backwheel.pressure)*balance.bk.wheel.pressure.minimumB;
+      end;
     end;
-    if player.bike.backwheel.pressure>=balance.bk.wheel.pressure.average then
+    public static function GetCBFrontWheel(c: char): real;
     begin
-      if c='g' then g:=g+(g*(player.bike.backwheel.pressure-balance.bk.wheel.pressure.average)*balance.bk.wheel.pressure.maximumG);
-      if c='b' then b:=b+(b*(player.bike.backwheel.pressure-balance.bk.wheel.pressure.average)*balance.bk.wheel.pressure.maximumB);
-    end
-    else
-    begin
-      if c='g' then g:=g+(g*(balance.bk.wheel.pressure.average-player.bike.backwheel.pressure)*balance.bk.wheel.pressure.minimumG);
-      if c='b' then b:=b+(b*(balance.bk.wheel.pressure.average-player.bike.backwheel.pressure)*balance.bk.wheel.pressure.minimumB);
+      if player.bike.frontwheel.pressure>=balance.bk.wheel.pressure.average then
+      begin
+        if c='g' then Result += (player.bike.frontwheel.pressure-balance.bk.wheel.pressure.average)*balance.bk.wheel.pressure.maximumG;
+        if c='b' then Result += (player.bike.frontwheel.pressure-balance.bk.wheel.pressure.average)*balance.bk.wheel.pressure.maximumB;
+      end
+      else
+      begin
+        if c='g' then Result += (balance.bk.wheel.pressure.average-player.bike.frontwheel.pressure)*balance.bk.wheel.pressure.minimumG;
+        if c='b' then Result += (balance.bk.wheel.pressure.average-player.bike.frontwheel.pressure)*balance.bk.wheel.pressure.minimumB;
+      end;
     end;
-    if player.bike.frontwheel.pressure>=balance.bk.wheel.pressure.average then
+    public static function GetEnergyCost(c: char): real;
     begin
-      if c='g' then g:=g+(g*(player.bike.frontwheel.pressure-balance.bk.wheel.pressure.average)*balance.bk.wheel.pressure.maximumG);
-      if c='b' then b:=b+(b*(player.bike.frontwheel.pressure-balance.bk.wheel.pressure.average)*balance.bk.wheel.pressure.maximumB);
-    end
-    else
-    begin
-      if c='g' then g:=g+(g*(balance.bk.wheel.pressure.average-player.bike.frontwheel.pressure)*balance.bk.wheel.pressure.minimumG);
-      if c='b' then b:=b+(b*(balance.bk.wheel.pressure.average-player.bike.frontwheel.pressure)*balance.bk.wheel.pressure.minimumB);
+      if c = 'g' then
+      begin
+        var g := balance.bk.mincostG;
+        g += g*GetCBFrame(c);
+        g += g*GetCBFork(c);
+        g += g*GetCBBack(c);
+        g += g*GetCBTransmission(c);
+        g += g*GetCBRudder(c);
+        g += g*GetCBBackWheel(c);
+        g += g*GetCBFrontWheel(c);
+        Result := g;
+      end;
+      
+      if c = 'b' then
+      begin
+        var b := balance.bk.mincostB;
+        b += b*GetCBFrame(c);
+        b += b*GetCBFork(c);
+        b += b*GetCBBack(c);
+        b += b*GetCBTransmission(c);
+        b += b*GetCBRudder(c);
+        b += b*GetCBBackWheel(c);
+        b += b*GetCBFrontWheel(c);
+        Result := b;
+      end;
     end;
-    if c='g' then Result:=g;
-    if c='b' then Result:=b;
   end;
+
+  ///Возвращает стоимость километра в энергии по типу дорог c
+  function energycost(c: char) := EnergyCosts.GetEnergyCost(c);
 
   ///Возвращает текущую скорость
   function curspeed(c: char): real;
@@ -5004,77 +5051,79 @@ begin
   LOG.Add('START Balancing');
   with balance do
   begin
-    balance.maxtutorial:=32;
-    mv_minsc:=2.5;
-    mv_maxsc:=8;
-    mvminstep:=0.1;
-    mvmaxstep:=1;
-    int_minx:= 100;
-    int_miny:= 30;
-    int_maxx:= 999;
-    int_maxy:= 999;
-    minnicksize:= 3;
-    maxnicksize:= 16;
-    minspeedong:= 12;
-    minspeedonb:= 10;
-    wateronmeter:= 0.04;
-    foodonmeter:= 0.015;
-    animminspeed:= 1;
-    animmaxspeed:= 8;
-    animKFspeed:= 200;
-    animKFseconds:= 100;
-    nighthourstart:= 22;
-    nighthourfinish:= 6;
-    night0:= 0.5;
-    night1:= 0.15;
-    criticalhp:= 100000;
-    minimaleff:= 0.75;
-    subaverage:= 0.5;
+    balance.maxtutorial := 32;
+    mv_minsc := 2.5;
+    mv_maxsc := 8;
+    mvminstep := 0.1;
+    mvmaxstep := 1;
+    int_minx := 100;
+    int_miny := 30;
+    int_maxx := 999;
+    int_maxy := 999;
+    minnicksize := 3;
+    maxnicksize := 16;
+    minspeedong := 12;
+    minspeedonb := 10;
+    wateronmeter := 0.04;
+    foodonmeter := 0.015;
+    animminspeed := 1;
+    animmaxspeed := 8;
+    animKFspeed := 200;
+    animKFseconds := 100;
+    nighthourstart := 22;
+    nighthourfinish := 6;
+    night0 := 0.5;
+    night1 := 0.15;
+    criticalhp := 100000;
+    minimaleff := 0.75;
+    subaverage := 0.5;
     
-    cameraveight:= 600;
-    needleveight:= 300;
+    cameraveight := 600;
+    needleveight := 300;
     
-    apartmentprice0:= 800000;
-    apartmentprice1:= 1200000;
-    apartmentprice2:= 2400000;
+    apartmentprice0 := 800000;
+    apartmentprice1 := 1200000;
+    apartmentprice2 := 2400000;
     
-    maxwritespd:= 36;
-    minwritespd:= 24;
+    maxwritespd := 36;
+    minwritespd := 24;
     
-    foodprice:= 2/25;
-    waterprice:= 3/100;
+    foodprice := 2/25;
+    waterprice := 3/100;
+    
+    distancebetweenroadbonuses  := 1;
     
     with MonthsKSpeed do
     begin
-      _1January:=0.66;
-      _2Febraury:=0.66;
-      _3March:=0.72;
-      _4April:=0.85;
-      _5May:=0.95;
-      _6June:=1;
-      _7July:=1;
-      _8August:=1;
-      _9September:=0.95;
-      _10October:=0.85;
-      _11November:=0.72;
-      _12December:=0.66;
+      _1January := 0.66;
+      _2Febraury := 0.66;
+      _3March := 0.72;
+      _4April := 0.85;
+      _5May := 0.95;
+      _6June := 1;
+      _7July := 1;
+      _8August := 1;
+      _9September := 0.95;
+      _10October := 0.85;
+      _11November := 0.72;
+      _12December := 0.66;
     end;
     
     with SpeedAndVeight do
     begin
       with BikeVeight do
       begin
-        minimalk:=0.8;
-        maximumk:=1.2;
-        minimum:=11000;
-        maximum:=14000;
+        minimalk := 0.8;
+        maximumk := 1.2;
+        minimum := 11000;
+        maximum := 14000;
       end;
       with ItemVeight do
       begin
-        minimalk:=0.9;
-        maximumk:=1.1;
-        minimum:=0.5;
-        maximum:=1;
+        minimalk := 0.9;
+        maximumk := 1.1;
+        minimum := 0.5;
+        maximum := 1;
       end;
     end;
     
@@ -5082,49 +5131,49 @@ begin
     begin
       with framematerial do
       begin
-        Steel:=ConsoleColor.DarkYellow;
-        SteelPlus:=ConsoleColor.DarkGray;
-        Alu6061:=ConsoleColor.DarkGreen;
-        Alu7075:=ConsoleColor.DarkCyan;
-        Titan:=ConsoleColor.DarkBlue;
+        Steel := ConsoleColor.DarkYellow;
+        SteelPlus := ConsoleColor.DarkGray;
+        Alu6061 := ConsoleColor.DarkGreen;
+        Alu7075 := ConsoleColor.DarkCyan;
+        Titan := ConsoleColor.DarkBlue;
       end;
       with susptype do
       begin
-        Steel:=ConsoleColor.DarkYellow;
-        Elastomer:=ConsoleColor.DarkYellow;
-        Pneumatic:=ConsoleColor.DarkGreen;
-        Oil:=ConsoleColor.DarkCyan;
-        OilPlus:=ConsoleColor.DarkBlue;
-        PneumaticPlus:=ConsoleColor.DarkBlue;
+        Steel := ConsoleColor.DarkYellow;
+        Elastomer := ConsoleColor.DarkYellow;
+        Pneumatic := ConsoleColor.DarkGreen;
+        Oil := ConsoleColor.DarkCyan;
+        OilPlus := ConsoleColor.DarkBlue;
+        PneumaticPlus := ConsoleColor.DarkBlue;
       end;
       with susptravel do
       begin
         with _0 do
         begin
-          min:=0;
-          max:=60;
-          indicate:=ConsoleColor.DarkYellow;
+          min := 0;
+          max := 60;
+          indicate := ConsoleColor.DarkYellow;
         end;
         
         with _1 do
         begin
-          min:=61;
-          max:=120;
-          indicate:=ConsoleColor.DarkGreen;
+          min := 61;
+          max := 120;
+          indicate := ConsoleColor.DarkGreen;
         end;
         
         with _2 do
         begin
-          min:=121;
-          max:=180;
-          indicate:=ConsoleColor.DarkCyan;
+          min := 121;
+          max := 180;
+          indicate := ConsoleColor.DarkCyan;
         end;
         
         with _3 do
         begin
-          min:=181;
-          max:=integer.MaxValue;
-          indicate:=ConsoleColor.DarkBlue;
+          min := 181;
+          max := integer.MaxValue;
+          indicate := ConsoleColor.DarkBlue;
         end;
       end;
       
@@ -5133,107 +5182,107 @@ begin
       begin
         with _0 do
         begin
-          min:=0;
-          max:=2000000;
-          indicate:=ConsoleColor.DarkYellow;
+          min := 0;
+          max := 2000000;
+          indicate := ConsoleColor.DarkYellow;
         end;
         
         with _1 do
         begin
-          min:=2001000;
-          max:=5000000;
-          indicate:=ConsoleColor.DarkGreen;
+          min := 2001000;
+          max := 5000000;
+          indicate := ConsoleColor.DarkGreen;
         end;
         
         with _2 do
         begin
-          min:=5001000;
-          max:=7500000;
-          indicate:=ConsoleColor.DarkCyan;
+          min := 5001000;
+          max := 7500000;
+          indicate := ConsoleColor.DarkCyan;
         end;
         
         with _3 do
         begin
-          min:=7501000;
-          max:=integer.MaxValue;
-          indicate:=ConsoleColor.DarkBlue;
+          min := 7501000;
+          max := integer.MaxValue;
+          indicate := ConsoleColor.DarkBlue;
         end;
       end;
       
       with backcount do
       begin
-        _1:=ConsoleColor.Red;
-        _6:=ConsoleColor.DarkYellow;
-        _7:=ConsoleColor.DarkYellow;
-        _8:=ConsoleColor.DarkYellow;
-        _9:=ConsoleColor.DarkGreen;
-        _10:=ConsoleColor.DarkGreen;
-        _11:=ConsoleColor.DarkBlue;
+        _1 := ConsoleColor.Red;
+        _6 := ConsoleColor.DarkYellow;
+        _7 := ConsoleColor.DarkYellow;
+        _8 := ConsoleColor.DarkYellow;
+        _9 := ConsoleColor.DarkGreen;
+        _10 := ConsoleColor.DarkGreen;
+        _11 := ConsoleColor.DarkBlue;
       end;
       with forecount do
       begin
-        _1:=ConsoleColor.DarkYellow;
-        _3:=ConsoleColor.DarkGreen;
+        _1 := ConsoleColor.DarkYellow;
+        _3 := ConsoleColor.DarkGreen;
       end;
       with ruddertype do
       begin
-        _0:=ConsoleColor.DarkGreen;
-        _1:=ConsoleColor.DarkBlue;
-        _2:=ConsoleColor.DarkBlue;
+        _0 := ConsoleColor.DarkGreen;
+        _1 := ConsoleColor.DarkBlue;
+        _2 := ConsoleColor.DarkBlue;
       end;
       with braketype do
       begin
-        _1:=ConsoleColor.DarkYellow;
-        _2:=ConsoleColor.DarkGreen;
-        _3:=ConsoleColor.DarkBlue;
+        _1 := ConsoleColor.DarkYellow;
+        _2 := ConsoleColor.DarkGreen;
+        _3 := ConsoleColor.DarkBlue;
       end;
       with wheelhits do
       begin
         with _1 do
         begin
-          min:=0;
-          max:=1999000;
-          indicate:=ConsoleColor.DarkYellow;
+          min := 0;
+          max := 1999000;
+          indicate := ConsoleColor.DarkYellow;
         end;
         with _2 do
         begin
-          min:=2000000;
-          max:=3999000;
-          indicate:=ConsoleColor.DarkGreen;
+          min := 2000000;
+          max := 3999000;
+          indicate := ConsoleColor.DarkGreen;
         end;
         with _3 do
         begin
-          min:=4000000;
-          max:=integer.MaxValue;
-          indicate:=ConsoleColor.DarkBlue;
+          min := 4000000;
+          max := integer.MaxValue;
+          indicate := ConsoleColor.DarkBlue;
         end;
       end;
     end;
     
     with Sell do
     begin
-      Oldermin:=1.5;
-      Olderadd:=-0.05;
-      Oldermaxlvl:=10;
+      Oldermin := 1.5;
+      Olderadd := -0.05;
+      Oldermaxlvl := 10;
     end;
     
     with CameraPrice do
     begin
-      min:= 200;
-      add:= -15;
-      maxlvl:= 10;
+      min :=  200;
+      add :=  -15;
+      maxlvl :=  10;
     end;
     
     with NeedlePrice do
     begin
-      min:= 300;
-      add:= -20;
-      maxlvl:= 10;
+      min :=  300;
+      add :=  -20;
+      maxlvl :=  10;
     end;
     
     with Send do
     begin
-      Sends:=Arr(
+      Sends := Arr(
       new TSend(10,80,120,1),
       new TSend(100,250,400,2),
       new TSend(200,400,650,2),
@@ -5243,77 +5292,77 @@ begin
       new TSend(1000,2000,3000,4)
       );
       
-      minrespect:= 500000;
-      maxrespect:= 1500000;
-      mink:= 0.5;
-      maxlvlk:= 10;
-      kadd:= 0.05
+      minrespect :=  500000;
+      maxrespect :=  1500000;
+      mink :=  0.5;
+      maxlvlk :=  10;
+      kadd :=  0.05
     end;
     
     with Crash do
     begin
-      minimumdechp:=20000;
-      dechpmaxlvl:=10;
-      dechpadd:=-1000;
+      minimumdechp := 20000;
+      dechpmaxlvl := 10;
+      dechpadd := -1000;
     end;
     
     with Wait do
     begin
-      energyatminute:=-100;
-      maxminutes:=60;
+      energyatminute := -100;
+      maxminutes := 60;
     end;
     
     with Sleep do
     begin
-      eff_Hotel:=1;
-      eff_Apart:=0.9;
-      eff_Tent:=1.25;
-      eff_Street:=1.8;
-      minimal:=0.9;
-      pcentathour:= 0.1;
-      pcahadd:= 0.0025;
-      pcahmaxlvl:= 10;
+      eff_Hotel := 1;
+      eff_Apart := 0.9;
+      eff_Tent := 1.25;
+      eff_Street := 1.8;
+      minimal := 0.9;
+      pcentathour :=  0.1;
+      pcahadd :=  0.0025;
+      pcahmaxlvl :=  10;
       
-      HotelPricemin:=Arr(200,600,1000);
-      HotelPriceadd:=Arr(20,60,100);
-      HotelPricelvlmax:=Arr(10,10,10);
+      HotelPricemin := Arr(200,600,1000);
+      HotelPriceadd := Arr(20,60,100);
+      HotelPricelvlmax := Arr(10,10,10);
       
-      HealthPlus[SleepType.Apart]:=0.8;
-      HealthPlus[SleepType.Hotel]:=2/3;
-      HealthPlus[SleepType.Tent]:=1/5;
-      HealthPlus[SleepType.Street]:=-1;
+      HealthPlus[SleepType.Apart] := 0.8;
+      HealthPlus[SleepType.Hotel] := 2/3;
+      HealthPlus[SleepType.Tent] := 1/5;
+      HealthPlus[SleepType.Street] := -1;
       
-      //HotelPriceatminute0:=5/12;
-      //HotelPriceatminute1:=35/48;
-      //HotelPriceatminute2:=1;
+      //HotelPriceatminute0 := 5/12;
+      //HotelPriceatminute1 := 35/48;
+      //HotelPriceatminute2 := 1;
       
       with _90100 do
       begin
-        min:= 0.9;
-        max:= 1;
-        color:= ConsoleColor.DarkBlue;
+        min := 0.9;
+        max := 1;
+        color := ConsoleColor.DarkBlue;
       end;
       with _7590 do
       begin
-        min:= 0.75;
-        max:= 0.9;
-        color:= ConsoleColor.DarkGreen;
+        min := 0.75;
+        max := 0.9;
+        color := ConsoleColor.DarkGreen;
       end;
       with _5075 do
       begin
-        min:= 0.5;
-        max:= 0.75;
-        color:= ConsoleColor.DarkYellow;
+        min := 0.5;
+        max := 0.75;
+        color := ConsoleColor.DarkYellow;
       end;
       with _2550 do
       begin
-        min:= 0.25;
-        max:= 0.5;
-        color:= ConsoleColor.DarkRed;
+        min := 0.25;
+        max := 0.5;
+        color := ConsoleColor.DarkRed;
       end;
       with _025 do
       begin
-        min:= 0;
+        min := 0;
         max:= 0.25;
         color:= ConsoleColor.Red;
       end;
@@ -5323,157 +5372,157 @@ begin
     begin
       with VBrake do
       begin
-        minimal:=750000;
-        lvladd:=75000;
-        maxlvl:=10;
+        minimal := 750000;
+        lvladd := 75000;
+        maxlvl := 10;
       end;
       with DiskMechanic do
       begin
-        minimal:=2500000;
-        lvladd:=250000;
-        maxlvl:=10;
+        minimal := 2500000;
+        lvladd := 250000;
+        maxlvl := 10;
       end;
       with DiskHydravlic do
       begin
-        minimal:=5000000;
-        lvladd:=500000;
-        maxlvl:=10;
+        minimal := 5000000;
+        lvladd := 500000;
+        maxlvl := 10;
       end;
     end;
     
     with NEWGAME do
     begin
-      maxveight:= 15000;
-      maxwater:= 2500;
-      maxfood:= 1000;
-      maxenergy:= 60000;
+      maxveight := 15000;
+      maxwater := 2500;
+      maxfood := 1000;
+      maxenergy := 60000;
     end;
         
     with levelup do
     begin
-      plusmveight:= 3000;
-      plusmwater:= 500;
-      plusmfood:= 300;
-      plusmenergy:= 7500;
-      expmin:= 500;
-      expk:= 500;
-      expmaxlevel:= 10;//Макс уровень левелапов, уровень продолжит повышаться
+      plusmveight := 3000;
+      plusmwater := 500;
+      plusmfood := 300;
+      plusmenergy := 7500;
+      expmin := 500;
+      expk := 500;
+      expmaxlevel := 10;//Макс уровень левелапов, уровень продолжит повышаться
     end;
     
     with shopmaxlevels do
     begin
-      type0:= 6;
-      type1:= 8;
-      type2:= 10;
+      type0 := 6;
+      type1 := 8;
+      type2 := 10;
     end;
     
     with economic do
     begin
       with town0 do
       begin
-        max:= 1.06;
-        min:= 0.9;
+        max := 1.06;
+        min := 0.9;
       end;
       with town1 do
       begin
-        max:= 1.18;
-        min:= 1.06;
+        max := 1.18;
+        min := 1.06;
       end;
       with town2 do
       begin
-        max:= 1.25;
-        min:= 1.18;
+        max := 1.25;
+        min := 1.18;
       end;
-      infochance:= 0.33;
-      infoprice:= 1000;
-      infok:= 250;
-      infomaxlevel:= 9999;
+      infochance := 0.33;
+      infoprice := 1000;
+      infok := 250;
+      infomaxlevel := 9999;
     end;
     
     with status do
     begin
       with _verybad do
       begin
-        min:= 0;
-        max:= 100000;
-        color:= ConsoleColor.Red;
+        min := 0;
+        max := 100000;
+        color := ConsoleColor.Red;
       end;
       with _bad do
       begin
-        min:= 100000;//BALANCE.CriticalHP
-        max:= 0.4;
-        color:= ConsoleColor.DarkRed;
+        min := 100000;//BALANCE.CriticalHP
+        max := 0.4;
+        color := ConsoleColor.DarkRed;
       end;
       with _normal do
       begin
-        min:= 0.4;
-        max:= 0.6;
-        color:= ConsoleColor.DarkYellow;
+        min := 0.4;
+        max := 0.6;
+        color := ConsoleColor.DarkYellow;
       end;
       with _good do
       begin
-        min:= 0.6;
-        max:= 0.9;
-        color:= ConsoleColor.DarkGreen;
+        min := 0.6;
+        max := 0.9;
+        color := ConsoleColor.DarkGreen;
       end;
       with _verygood do
       begin
-        min:= 0.9;
-        max:= 1;
-        color:= ConsoleColor.DarkBlue;
+        min := 0.9;
+        max := 1;
+        color := ConsoleColor.DarkBlue;
       end;
     end;
     
     with bk do
     begin
       ///Рама
-      mincostG:= 1-1/9;
-      mincostB:= 1+3/7;
+      mincostG := 1-1/9;
+      mincostB := 1+3/7;
       with frame do
       begin
         with material do
         begin
           with steel do
           begin
-            minlevel:= 0;
-            roadg:= +0.06;
-            roadb:= +0.04;
-            hitpoints:= 12000000;
+            minlevel := 0;
+            roadg := +0.06;
+            roadb := +0.04;
+            hitpoints := 12000000;
           end;
           with steelplus do
           begin
-            minlevel:= 1;
-            roadg:= 0;
-            roadb:= 0;
-            hitpoints:= 15000000;//метров
+            minlevel := 1;
+            roadg := 0;
+            roadb := 0;
+            hitpoints := 15000000;//метров
           end;
           with alu6061 do
           begin
-            minlevel:= 3;
-            roadg:= -0.03;
-            roadb:= -0.02;
-            hitpoints:= 10000000;//метров
+            minlevel := 3;
+            roadg := -0.03;
+            roadb := -0.02;
+            hitpoints := 10000000;//метров
           end;
           with alu7075 do
           begin
-            minlevel:= 4;
-            roadg:= -0.06;
-            roadb:= -0.04;
-            hitpoints:= 10000000;//метров
+            minlevel := 4;
+            roadg := -0.06;
+            roadb := -0.04;
+            hitpoints := 10000000;//метров
           end;
           with titan do
           begin
-            minlevel:= 6;
-            roadg:= -0.1;
-            roadb:= -0.08;
-            hitpoints:= 20000000;//метров
+            minlevel := 6;
+            roadg := -0.1;
+            roadb := -0.08;
+            hitpoints := 20000000;//метров
           end;
         end;
         with hp do
         begin
-          average:= 0.5;
-          minimal:= +0.2;
-          maximum:= -0.1;
+          average := 0.5;
+          minimal := +0.2;
+          maximum := -0.1;
         end;
       end;
       with fork do
@@ -5482,88 +5531,88 @@ begin
         begin
           with steel do
           begin
-            minlevel:= 2;
-            roadg:= 0;
-            roadb:= -0.02;
-            hitpoints:= 800000;
+            minlevel := 2;
+            roadg := 0;
+            roadb := -0.02;
+            hitpoints := 800000;
           end;
           with steelplus do
           begin
-            minlevel:= 3;
-            roadg:= 0;
-            roadb:= -0.04;
-            hitpoints:= 1000000;
+            minlevel := 3;
+            roadg := 0;
+            roadb := -0.04;
+            hitpoints := 1000000;
           end;
           with pneumatic do
           begin
-            minlevel:= 4;
-            roadg:= 0;
-            roadb:= -0.08;
-            hitpoints:= 4000000;
+            minlevel := 4;
+            roadg := 0;
+            roadb := -0.08;
+            hitpoints := 4000000;
           end;
           with pneumaticplus do
           begin
-            minlevel:= 10;
-            roadg:= 0;
-            roadb:= -0.15;
-            hitpoints:= 10000000;
+            minlevel := 10;
+            roadg := 0;
+            roadb := -0.15;
+            hitpoints := 10000000;
           end;
           with oil do
           begin
-            minlevel:= 6;
-            roadg:= 0;
-            roadb:= -0.12;
-            hitpoints:= 8000000;
+            minlevel := 6;
+            roadg := 0;
+            roadb := -0.12;
+            hitpoints := 8000000;
           end;
           with oilplus do
           begin
-            minlevel:= 8;
-            roadg:= 0;
-            roadb:= -0.12;
-            hitpoints:= 8000000;
+            minlevel := 8;
+            roadg := 0;
+            roadb := -0.12;
+            hitpoints := 8000000;
           end;
           with flag0 do
           begin
-            minlevel:= 0;
-            roadg:= 0;
-            roadb:= +0.1;
+            minlevel := 0;
+            roadg := 0;
+            roadb := +0.1;
           end;
           with flag1 do
           begin
-            minlevel:= 2;
-            roadg:= +0.25;
-            roadb:= 0;
+            minlevel := 2;
+            roadg := +0.25;
+            roadb := 0;
           end;
         end;
         with hp do
         begin
-          average:= 0.5;
-          minimal:= +0.2;
-          maximum:= -0.1;
+          average := 0.5;
+          minimal := +0.2;
+          maximum := -0.1;
         end;
         with susptravel1 do
         begin
-          min:= 0;
-          max:= 50;
-          value:= -0.0005;
+          min := 0;
+          max := 50;
+          value := -0.0005;
         end;
         with susptravel2 do
         begin
-          min:= 50;
-          max:= 100;
-          value:= -0.001;
+          min := 50;
+          max := 100;
+          value := -0.001;
         end;
         with susptravel3 do
         begin
-          min:= 100;
-          max:= 300;
-          value:= -0.0005;
+          min := 100;
+          max := 300;
+          value := -0.0005;
         end;
         with block do
         begin
-          minlevel:= 5;
-          roadg:= -0.2;
-          roadb:= 0;
+          minlevel := 5;
+          roadg := -0.2;
+          roadb := 0;
         end;
       end;
       with bsusp do
@@ -5572,508 +5621,508 @@ begin
         begin
           with steel do
           begin
-            minlevel:= 2;
-            roadg:= 0;
-            roadb:= -0.03;
-            hitpoints:= 1000000;
+            minlevel := 2;
+            roadg := 0;
+            roadb := -0.03;
+            hitpoints := 1000000;
           end;
           with steelplus do
           begin
-            minlevel:= 3;
-            roadg:= 0;
-            roadb:= -0.05;
-            hitpoints:= 1500000;
+            minlevel := 3;
+            roadg := 0;
+            roadb := -0.05;
+            hitpoints := 1500000;
           end;
           with pneumatic do
           begin
-            minlevel:= 4;
-            roadg:= 0;
-            roadb:= -0.08;
-            hitpoints:= 5000000;
+            minlevel := 4;
+            roadg := 0;
+            roadb := -0.08;
+            hitpoints := 5000000;
           end;
           with pneumaticplus do
           begin
-            minlevel:= 10;
-            roadg:= 0;
-            roadb:= -0.15;
-            hitpoints:= 10000000;
+            minlevel := 10;
+            roadg := 0;
+            roadb := -0.15;
+            hitpoints := 10000000;
           end;
           with oil do
           begin
-            minlevel:= 6;
-            roadg:= 0;
-            roadb:= -0.12;
-            hitpoints:= 8000000;
+            minlevel := 6;
+            roadg := 0;
+            roadb := -0.12;
+            hitpoints := 8000000;
           end;
           with flag0 do
           begin
-            minlevel:= 0;
-            roadg:= 0;
-            roadb:= 0;
+            minlevel := 0;
+            roadg := 0;
+            roadb := 0;
           end;
           with flag1 do
           begin
-            minlevel:= 4;
-            roadg:= +0.25;
-            roadb:= 0;
+            minlevel := 4;
+            roadg := +0.25;
+            roadb := 0;
           end;
         end;
         with block do
         begin
-          minlevel:= 5;
-          roadg:= -0.2;
-          roadb:= 0;
+          minlevel := 5;
+          roadg := -0.2;
+          roadb := 0;
         end;
         with susptravel1 do
         begin
-          min:= 0;
-          max:= 50;
-          value:= -0.0005;
+          min := 0;
+          max := 50;
+          value := -0.0005;
         end;
         with susptravel2 do
         begin
-          min:= 50;
-          max:= 100;
-          value:= -0.001;
+          min := 50;
+          max := 100;
+          value := -0.001;
         end;
         with susptravel3 do
         begin
-          min:= 100;
-          max:= 300;
-          value:= -0.0005;
+          min := 100;
+          max := 300;
+          value := -0.0005;
         end;
         with hp do
         begin
-          average:= 0.5;
-          minimal:= +0.1;
-          maximum:= -0.1;
+          average := 0.5;
+          minimal := +0.1;
+          maximum := -0.1;
         end;
       end;
       with transmission do
       begin
         with backs0 do
         begin
-          minlevel:= 0;
-          roadG:= +0.15;
-          roadB:= +0.1;
+          minlevel := 0;
+          roadG := +0.15;
+          roadB := +0.1;
         end;
         with backs1 do
         begin
-          minlevel:= 2;
-          roadG:= 0;
-          roadB:= 0;
+          minlevel := 2;
+          roadG := 0;
+          roadB := 0;
         end;
         with fores0 do
         begin
-          minlevel:= 0;
-          roadG:= 0;
-          roadB:= 0;
+          minlevel := 0;
+          roadG := 0;
+          roadB := 0;
         end;
         with fores1 do
         begin
-          minlevel:= 4;
-          roadG:= -0.05;
-          roadB:= -0.15;
+          minlevel := 4;
+          roadG := -0.05;
+          roadB := -0.15;
         end;
         with count6 do
         begin
-          minlevel:= 2;
-          speedG:= 5;
-          speedB:= 3;
-          hitpoints:= 3000000;
+          minlevel := 2;
+          speedG := 5;
+          speedB := 3;
+          hitpoints := 3000000;
         end;
         with count7 do
         begin
-          minlevel:= 3;
-          speedG:= 6;
-          speedB:= 4;
-          hitpoints:= 3000000;
+          minlevel := 3;
+          speedG := 6;
+          speedB := 4;
+          hitpoints := 3000000;
         end;
         with count8 do
         begin
-          minlevel:= 5;
-          speedG:= 8;
-          speedB:= 5;
-          hitpoints:= 3000000;
+          minlevel := 5;
+          speedG := 8;
+          speedB := 5;
+          hitpoints := 3000000;
         end;
         with count9 do
         begin
-          minlevel:= 7;
-          speedG:= 10;
-          speedB:= 6;
-          hitpoints:= 3000000;
+          minlevel := 7;
+          speedG := 10;
+          speedB := 6;
+          hitpoints := 3000000;
         end;
         with count10 do
         begin
-          minlevel:= 8;
-          speedG:= 12;
-          speedB:= 7;
-          hitpoints:= 3000000;
+          minlevel := 8;
+          speedG := 12;
+          speedB := 7;
+          hitpoints := 3000000;
         end;
         with count11 do
         begin
-          minlevel:= 10;
-          speedG:= 14;
-          speedB:= 8;
-          hitpoints:= 3000000;
+          minlevel := 10;
+          speedG := 14;
+          speedB := 8;
+          hitpoints := 3000000;
         end;
         with hp do
         begin
-          average:= 0.5;
-          minimal:= +0.4;
-          maximum:= -0.1;
+          average := 0.5;
+          minimal := +0.4;
+          maximum := -0.1;
         end;
       end;
       with rudder do
       begin
         with sort1 do
         begin
-          minlevel:= 0;
-          speedg:= 0;
-          speedb:= 0;
-          hitpoints:= 5000000;
+          minlevel := 0;
+          speedg := 0;
+          speedb := 0;
+          hitpoints := 5000000;
         end;
         with sort2 do
         begin
-          minlevel:= 2;
-          speedg:= 1;
-          speedb:= 2;
-          hitpoints:= 15000000;
+          minlevel := 2;
+          speedg := 1;
+          speedb := 2;
+          hitpoints := 15000000;
         end;
         with sort3 do
         begin
-          minlevel:= 5;
-          speedg:= 3;
-          speedb:= 0;
-          hitpoints:= 10000000;
+          minlevel := 5;
+          speedg := 3;
+          speedb := 0;
+          hitpoints := 10000000;
         end;
         with hp do
         begin
-          average:= 0.5;
-          minimal:= +0.1;
-          maximum:= -0.01;
+          average := 0.5;
+          minimal := +0.1;
+          maximum := -0.01;
         end;
       end;
       with backbreak do
       begin
         with none do
         begin
-          crashchance:= 0.085;
+          crashchance := 0.085;
         end;
         with vbrake do
         begin
-          crashchance:= 0.003;
-          hitpoints:= 3000000;
+          crashchance := 0.003;
+          hitpoints := 3000000;
         end;
         with dm do
         begin
-          crashchance:= 0.002;
-          hitpoints:= 10000000;
+          crashchance := 0.002;
+          hitpoints := 10000000;
         end;
         with dh do
         begin
-          crashchance:= 0.001;
-          hitpoints:= 15000000;
+          crashchance := 0.001;
+          hitpoints := 15000000;
         end;
         with hp do
         begin
-          average:= 0.7;
-          crahsminimum:= +0.1;//при меньше авераге
-          crahsmaximum:= 0;//при больше авераге
+          average := 0.7;
+          crahsminimum := +0.1;//при меньше авераге
+          crahsmaximum := 0;//при больше авераге
         end;
       end;
       with frontbreak do
       begin
         with none do
         begin
-          crashchance:= 0.085;
+          crashchance := 0.085;
         end;
         with vbrake do
         begin
-          crashchance:= 0.003;
-          hitpoints:= 3000000;
+          crashchance := 0.003;
+          hitpoints := 3000000;
         end;
         with dm do
         begin
-          crashchance:= 0.002;
-          hitpoints:= 10000000;
+          crashchance := 0.002;
+          hitpoints := 10000000;
         end;
         with dh do
         begin
-          crashchance:= 0.001;
-          hitpoints:= 15000000;
+          crashchance := 0.001;
+          hitpoints := 15000000;
         end;
         with hp do
         begin
-          average:= 0.7;
-          crahsminimum:= +0.1;//при меньше авераге
-          crahsmaximum:= 0;//при больше авераге
+          average := 0.7;
+          crahsminimum := +0.1;//при меньше авераге
+          crahsmaximum := 0;//при больше авераге
         end;
       end;
       with wheel do
       begin
-        hitpoints:= 2500;
+        hitpoints := 2500;
         with pressure do
         begin
-          average:= 2;
-          minimum:= 0.5;
-          maximum:= 3.5;
-          minimumG:= +(1/3);
-          minimumB:= -(1/12);
-          maximumG:= -(1/12);
-          maximumB:= +(1/3);
-          permeter:= 0.0000067;
+          average := 2;
+          minimum := 0.5;
+          maximum := 3.5;
+          minimumG := +(1/3);
+          minimumB := -(1/12);
+          maximumG := -(1/12);
+          maximumB := +(1/3);
+          permeter := 0.0000067;
         end;
         with hp do
         begin
-          average:= 0.95;
-          minimumchance:= 0;
-          maximumchance:= 0.01;
-          chance:= 0.05;
+          average := 0.95;
+          minimumchance := 0;
+          maximumchance := 0.01;
+          chance := 0.05;
         end;
         with needle do
         begin
-          minimum:= 16;//меньше - сразу прокол
-          average:= 28;
-          maximum:= 32;
-          minimumchance:= 0.03;
-          chancek:= 2;
-          maximumchance:= 27;
+          minimum := 16;//меньше - сразу прокол
+          average := 28;
+          maximum := 32;
+          minimumchance := 0.03;
+          chancek := 2;
+          maximumchance := 27;
         end;
       end;
       with allbreak do
       begin
-        crashchancemax:= 0.33;
-        crashchancemin:= 0.001;
-        crashchance1:= 0.02;
-        minimal:= 0.1;
-        _1maxeff:= 1000000;
-        _2maxeff:= 2500000;
-        _3maxeff:= 5000000;
+        crashchancemax := 0.33;
+        crashchancemin := 0.001;
+        crashchance1 := 0.02;
+        minimal := 0.1;
+        _1maxeff := 1000000;
+        _2maxeff := 2500000;
+        _3maxeff := 5000000;
       end;
     end;
     end;
     with balance.timing do
     begin
     {$region BSUSP_DEMONTAGE}
-    bsusp_demontage.maximum:=90;
-    bsusp_demontage.levelmax:=10;
-    bsusp_demontage.minimum:=60;
-    bsusp_demontage.k:=3;
-    bsusp_demontage.addcurrent:= 10;
-    bsusp_demontage.levelk:= 1;
-    bsusp_demontage.addcurrentmax:= 20;
-    bsusp_demontage.addcurrentlevelmax:= 10;
-    bsusp_demontage.pause:= 50;
-    bsusp_demontage.energy:= 4000;
+    bsusp_demontage.maximum := 90;
+    bsusp_demontage.levelmax := 10;
+    bsusp_demontage.minimum := 60;
+    bsusp_demontage.k :=3;
+    bsusp_demontage.addcurrent := 10;
+    bsusp_demontage.levelk := 1;
+    bsusp_demontage.addcurrentmax := 20;
+    bsusp_demontage.addcurrentlevelmax := 10;
+    bsusp_demontage.pause := 50;
+    bsusp_demontage.energy := 4000;
     {$endregion}
     
     {$region BREAK_DEMONTAGE}
-    break_demontage.maximum:= 60;
-    break_demontage.levelmax:= 10;
-    break_demontage.minimum:= 30;
-    break_demontage.k:= 3;
-    break_demontage.addcurrent:= 10;
-    break_demontage.levelk:= 1;
-    break_demontage.addcurrentmax:= 20;
-    break_demontage.addcurrentlevelmax:= 10;
-    break_demontage.pause:= 50;
-    break_demontage.energy:= 6000;
+    break_demontage.maximum := 60;
+    break_demontage.levelmax := 10;
+    break_demontage.minimum := 30;
+    break_demontage.k := 3;
+    break_demontage.addcurrent := 10;
+    break_demontage.levelk := 1;
+    break_demontage.addcurrentmax := 20;
+    break_demontage.addcurrentlevelmax := 10;
+    break_demontage.pause := 50;
+    break_demontage.energy := 6000;
     {$endregion}
     
     {$region CAMERING}
-    camering.maximum:= 20;
-    camering.levelmax:= 10;
-    camering.minimum:= 10;
-    camering.k:= 1;
-    camering.addcurrent:= 10;
-    camering.levelk:= 1;
-    camering.addcurrentmax:= 20;
-    camering.addcurrentlevelmax:= 10;
-    camering.pause:= 50;
-    camering.energy:= 2000;
+    camering.maximum := 20;
+    camering.levelmax := 10;
+    camering.minimum := 10;
+    camering.k := 1;
+    camering.addcurrent := 10;
+    camering.levelk := 1;
+    camering.addcurrentmax := 20;
+    camering.addcurrentlevelmax := 10;
+    camering.pause := 50;
+    camering.energy := 2000;
     {$endregion}
       
     {$region NEEDLING}
-    needling.maximum:= 120;
-    needling.levelmax:= 10;
-    needling.minimum:= 60;
-    needling.k:= 6;
-    needling.addcurrent:= 10;
-    needling.levelk:= 1;
-    needling.addcurrentmax:= 20;
-    needling.addcurrentlevelmax:= 10;
-    needling.pause:= 50;
-    needling.energy:= 8000;
+    needling.maximum := 120;
+    needling.levelmax := 10;
+    needling.minimum := 60;
+    needling.k := 6;
+    needling.addcurrent := 10;
+    needling.levelk := 1;
+    needling.addcurrentmax := 20;
+    needling.addcurrentlevelmax := 10;
+    needling.pause := 50;
+    needling.energy := 8000;
     {$endregion}
       
     {$region PUMPING}
-    pumping.maximum:= 300;
-    pumping.levelmax:= 10;
-    pumping.minimum:= 60;
-    pumping.k:= 24;
-    pumping.addcurrent:= 10;
-    pumping.levelk:= 4;
-    pumping.addcurrentmax:= 80;
-    pumping.addcurrentlevelmax:= 40;
-    pumping.pause:= 20;
-    pumping.energy:= 100;
+    pumping.maximum := 300;
+    pumping.levelmax := 10;
+    pumping.minimum := 60;
+    pumping.k := 24;
+    pumping.addcurrent := 10;
+    pumping.levelk := 4;
+    pumping.addcurrentmax := 80;
+    pumping.addcurrentlevelmax := 40;
+    pumping.pause := 20;
+    pumping.energy := 100;
     {$endregion}
     
     {$region IT_FRAMING}
-    it_framing.maximum:= 600;
-    it_framing.levelmax:= 10;
-    it_framing.minimum:= 300;
-    it_framing.k:= 20;
-    it_framing.addcurrent:= 5;
-    it_framing.levelk:= 0;
-    it_framing.addcurrentmax:= 5;
-    it_framing.addcurrentlevelmax:= 0;
-    it_framing.pause:= 50;
-    it_framing.energy:= 30000;
+    it_framing.maximum := 600;
+    it_framing.levelmax := 10;
+    it_framing.minimum := 300;
+    it_framing.k := 20;
+    it_framing.addcurrent := 5;
+    it_framing.levelk := 0;
+    it_framing.addcurrentmax := 5;
+    it_framing.addcurrentlevelmax := 0;
+    it_framing.pause := 50;
+    it_framing.energy := 30000;
     {$endregion}
       
     {$region IT_FORKING}
-    it_forking.maximum:= 150;
-    it_forking.levelmax:= 10;
-    it_forking.minimum:= 60;
-    it_forking.k:= 9;
-    it_forking.addcurrent:= 9;
-    it_forking.levelk:= 0;
-    it_forking.addcurrentmax:= 9;
-    it_forking.addcurrentlevelmax:= 0;
-    it_forking.pause:= 50;
-    it_forking.energy:= 15000;
+    it_forking.maximum := 150;
+    it_forking.levelmax := 10;
+    it_forking.minimum := 60;
+    it_forking.k := 9;
+    it_forking.addcurrent := 9;
+    it_forking.levelk := 0;
+    it_forking.addcurrentmax := 9;
+    it_forking.addcurrentlevelmax := 0;
+    it_forking.pause := 50;
+    it_forking.energy := 15000;
     {$endregion}
     
     {$region IT_BSUSPING}
-    it_bsusping.maximum:= 90;
-    it_bsusping.levelmax:= 10;
-    it_bsusping.minimum:= 60;
-    it_bsusping.k:= 3;
-    it_bsusping.addcurrent:= 10;
-    it_bsusping.levelk:= 1;
-    it_bsusping.addcurrentmax:= 20;
-    it_bsusping.addcurrentlevelmax:= 10;
-    it_bsusping.pause:= 50;
-    it_bsusping.energy:= 4000;
+    it_bsusping.maximum := 90;
+    it_bsusping.levelmax := 10;
+    it_bsusping.minimum := 60;
+    it_bsusping.k := 3;
+    it_bsusping.addcurrent := 10;
+    it_bsusping.levelk := 1;
+    it_bsusping.addcurrentmax := 20;
+    it_bsusping.addcurrentlevelmax := 10;
+    it_bsusping.pause := 50;
+    it_bsusping.energy := 4000;
     {$endregion}
     
     {$region IT_TRANSING}
-    it_transing.maximum:= 180;
-    it_transing.levelmax:= 10;
-    it_transing.minimum:= 90;
-    it_transing.k:= 9;
-    it_transing.addcurrent:= 7;
-    it_transing.levelk:= 0;
-    it_transing.addcurrentmax:= 7;
-    it_transing.addcurrentlevelmax:= 0;
-    it_transing.pause:= 50;
-    it_transing.energy:= 19000;
+    it_transing.maximum := 180;
+    it_transing.levelmax := 10;
+    it_transing.minimum := 90;
+    it_transing.k := 9;
+    it_transing.addcurrent := 7;
+    it_transing.levelk := 0;
+    it_transing.addcurrentmax := 7;
+    it_transing.addcurrentlevelmax := 0;
+    it_transing.pause := 50;
+    it_transing.energy := 19000;
     {$endregion}
     
     {$region IT_RUDDERING}
-    it_ruddering.maximum:= 20;
-    it_ruddering.levelmax:= 10;
-    it_ruddering.minimum:= 10;
-    it_ruddering.k:= 1;
-    it_ruddering.addcurrent:= 10;
-    it_ruddering.levelk:= 1;
-    it_ruddering.addcurrentmax:= 20;
-    it_ruddering.addcurrentlevelmax:= 10;
-    it_ruddering.pause:= 40;
-    it_ruddering.energy:= 5000;
+    it_ruddering.maximum := 20;
+    it_ruddering.levelmax := 10;
+    it_ruddering.minimum := 10;
+    it_ruddering.k := 1;
+    it_ruddering.addcurrent := 10;
+    it_ruddering.levelk := 1;
+    it_ruddering.addcurrentmax := 20;
+    it_ruddering.addcurrentlevelmax := 10;
+    it_ruddering.pause := 40;
+    it_ruddering.energy := 5000;
     {$endregion}
     
     {$region IT_BREAKING}
-    it_breaking.maximum:= 90;
-    it_breaking.levelmax:= 10;
-    it_breaking.minimum:= 60;
-    it_breaking.k:= 3;
-    it_breaking.addcurrent:= 10;
-    it_breaking.levelk:= 1;
-    it_breaking.addcurrentmax:= 20;
-    it_breaking.addcurrentlevelmax:= 10;
-    it_breaking.pause:= 50;
-    it_breaking.energy:= 10000;
+    it_breaking.maximum := 90;
+    it_breaking.levelmax := 10;
+    it_breaking.minimum := 60;
+    it_breaking.k := 3;
+    it_breaking.addcurrent := 10;
+    it_breaking.levelk := 1;
+    it_breaking.addcurrentmax := 20;
+    it_breaking.addcurrentlevelmax := 10;
+    it_breaking.pause := 50;
+    it_breaking.energy := 10000;
     {$endregion}
       
     {$region IT_WHEELING}
-    it_wheeling.maximum:= 5;
-    it_wheeling.levelmax:= 3;
-    it_wheeling.minimum:= 2;
-    it_wheeling.k:= 1;
-    it_wheeling.addcurrent:= 10;
-    it_wheeling.levelk:= 1;
-    it_wheeling.addcurrentmax:= 20;
-    it_wheeling.addcurrentlevelmax:= 10;
-    it_wheeling.pause:= 50;
-    it_wheeling.energy:= 2500;
+    it_wheeling.maximum := 5;
+    it_wheeling.levelmax := 3;
+    it_wheeling.minimum := 2;
+    it_wheeling.k := 1;
+    it_wheeling.addcurrent := 10;
+    it_wheeling.levelk := 1;
+    it_wheeling.addcurrentmax := 20;
+    it_wheeling.addcurrentlevelmax := 10;
+    it_wheeling.pause := 50;
+    it_wheeling.energy := 2500;
     {$endregion}
       
     {$region IT_BREAKSCARDING}
-    it_breakcarding.maximum:= 30;
-    it_breakcarding.levelmax:= 5;
-    it_breakcarding.minimum:= 20;
-    it_breakcarding.k:= 2;
-    it_breakcarding.addcurrent:= 10;
-    it_breakcarding.levelk:= 1;
-    it_breakcarding.addcurrentmax:= 20;
-    it_breakcarding.addcurrentlevelmax:= 10;
-    it_breakcarding.pause:= 50;
-    it_breakcarding.energy:= 4000;
+    it_breakcarding.maximum := 30;
+    it_breakcarding.levelmax := 5;
+    it_breakcarding.minimum := 20;
+    it_breakcarding.k := 2;
+    it_breakcarding.addcurrent := 10;
+    it_breakcarding.levelk := 1;
+    it_breakcarding.addcurrentmax := 20;
+    it_breakcarding.addcurrentlevelmax := 10;
+    it_breakcarding.pause := 50;
+    it_breakcarding.energy := 4000;
     {$endregion}
       
     {$region IT_SENDING}
-    it_sending.maximum:= 2;
-    it_sending.levelmax:= 1;
-    it_sending.minimum:= 1;
-    it_sending.k:= 1;
-    it_sending.addcurrent:= 50;
-    it_sending.levelk:= 0;
-    it_sending.addcurrentmax:= 50;
-    it_sending.addcurrentlevelmax:= 0;
-    it_sending.pause:= 20;
-    it_sending.energy:= 0;
+    it_sending.maximum := 2;
+    it_sending.levelmax := 1;
+    it_sending.minimum := 1;
+    it_sending.k := 1;
+    it_sending.addcurrent := 50;
+    it_sending.levelk := 0;
+    it_sending.addcurrentmax := 50;
+    it_sending.addcurrentlevelmax := 0;
+    it_sending.pause := 20;
+    it_sending.energy := 0;
     {$endregion}
       
     {$region IT_REPLACING}
-    it_replacing.maximum:= 6;
-    it_replacing.levelmax:= 1;
-    it_replacing.minimum:= 5;
-    it_replacing.k:= 1;
-    it_replacing.addcurrent:= 30;
-    it_replacing.levelk:= 0;
-    it_replacing.addcurrentmax:= 30;
-    it_replacing.addcurrentlevelmax:= 0;
-    it_replacing.pause:= 40;
-    it_replacing.energy:= 1000;
+    it_replacing.maximum := 6;
+    it_replacing.levelmax := 1;
+    it_replacing.minimum := 5;
+    it_replacing.k := 1;
+    it_replacing.addcurrent := 30;
+    it_replacing.levelk := 0;
+    it_replacing.addcurrentmax := 30;
+    it_replacing.addcurrentlevelmax := 0;
+    it_replacing.pause := 40;
+    it_replacing.energy := 1000;
     {$endregion}
     
     {$region AP_BUY}
-    ap_buy.maximum:= 91;
-    ap_buy.levelmax:= 1;
-    ap_buy.minimum:= 90;
-    ap_buy.k:= 1;
-    ap_buy.addcurrent:= 10;
-    ap_buy.levelk:= 0;
-    ap_buy.addcurrentmax:= 10;
-    ap_buy.addcurrentlevelmax:= 0;
-    ap_buy.pause:= 60;
-    ap_buy.energy:= 0;
+    ap_buy.maximum := 91;
+    ap_buy.levelmax := 1;
+    ap_buy.minimum := 90;
+    ap_buy.k := 1;
+    ap_buy.addcurrent := 10;
+    ap_buy.levelk := 0;
+    ap_buy.addcurrentmax := 10;
+    ap_buy.addcurrentlevelmax := 0;
+    ap_buy.pause := 60;
+    ap_buy.energy := 0;
     {$endregion}
     
     {$region AP_SELL}
-    ap_sell.maximum:= 120;
-    ap_sell.levelmax:= 10;
-    ap_sell.minimum:= 90;
-    ap_sell.k:= 3;
-    ap_sell.addcurrent:= 10;
-    ap_sell.levelk:= 0;
-    ap_sell.addcurrentmax:= 10;
-    ap_sell.addcurrentlevelmax:= 0;
-    ap_sell.pause:= 60;
-    ap_sell.energy:= 0;
+    ap_sell.maximum := 120;
+    ap_sell.levelmax := 10;
+    ap_sell.minimum := 90;
+    ap_sell.k := 3;
+    ap_sell.addcurrent := 10;
+    ap_sell.levelk := 0;
+    ap_sell.addcurrentmax := 10;
+    ap_sell.addcurrentlevelmax := 0;
+    ap_sell.pause := 60;
+    ap_sell.energy := 0;
     {$endregion}
   end;
   
@@ -7615,7 +7664,16 @@ begin
               if game.road.arr[i].block then Console.ForegroundColor:=consolecolor.Gray;
               Console.SetCursorPosition(5,3+(i*2));
               write(inter[9].face[0],': ');
-              if game.road.arr[i].tp.ToLower='g' then write(inter[9].face[1]) else write(inter[9].face[2]);
+              if game.road.arr[i].tp.ToLower='g' then
+              begin
+                Console.ForegroundColor := ConsoleColor.DarkGray;
+                write(inter[9].face[1]);
+              end
+              else
+              begin
+                Console.ForegroundColor := ConsoleColor.DarkYellow;
+                write(inter[9].face[2]);
+              end;
               Console.ForegroundColor:=consolecolor.Black;
             end;
             Console.SetCursorPosition(1,(game.road.arr.Length*2)+2);
@@ -8469,6 +8527,7 @@ begin
               Console.ForegroundColor:=consolecolor.Black;
             end;
             {$endregion}
+            
             Console.SetCursorPosition(1,11);
             if player.bike.odo>0 then
             begin
@@ -8486,6 +8545,54 @@ begin
             write(bikes[10].value[0],': ',BikeVeight div 10 / 100,' ',inter[0].face[10]);
             Console.SetCursorPosition(1,15);
             write(bikes[10].value[1],': ',Round(player.bike.odo * 10)/10,' ',inter[0].face[8]);
+            
+            {$region RoadBonus}
+            System.Globalization.NumberFormatInfo.CurrentInfo.PercentDecimalDigits := 0;
+            //Frame & BackSuspension
+            var lbtp := 4 + balance.distancebetweenroadbonuses;
+            Console.SetCursorPosition(50, 2);
+            Console.ForegroundColor := ConsoleColor.DarkGray;
+            write(Concat('+',(EnergyCosts.GetCBFrame('g')+EnergyCosts.GetCBBack('g')).ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
+            Console.ForegroundColor := ConsoleColor.DarkYellow;
+            write(Concat('+',(EnergyCosts.GetCBFrame('b')+EnergyCosts.GetCBBack('b')).ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
+            
+            //Fork
+            Console.SetCursorPosition(50, 3);
+            Console.ForegroundColor := ConsoleColor.DarkGray;
+            write(Concat('+',EnergyCosts.GetCBFork('g').ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
+            Console.ForegroundColor := ConsoleColor.DarkYellow;
+            write(Concat('+',EnergyCosts.GetCBFork('b').ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
+            
+            //Transmission
+            Console.SetCursorPosition(50, 4);
+            Console.ForegroundColor := ConsoleColor.DarkGray;
+            write(Concat('+',EnergyCosts.GetCBTransmission('g').ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
+            Console.ForegroundColor := ConsoleColor.DarkYellow;
+            write(Concat('+',EnergyCosts.GetCBTransmission('b').ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
+            
+            //Rudder
+            Console.SetCursorPosition(50, 5);
+            Console.ForegroundColor := ConsoleColor.DarkGray;
+            write(Concat('+',EnergyCosts.GetCBRudder('g').ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
+            Console.ForegroundColor := ConsoleColor.DarkYellow;
+            write(Concat('+',EnergyCosts.GetCBRudder('b').ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
+            
+            //BackWheel
+            Console.SetCursorPosition(50, 8);
+            Console.ForegroundColor := ConsoleColor.DarkGray;
+            write(Concat('+',EnergyCosts.GetCBBackWheel('g').ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
+            Console.ForegroundColor := ConsoleColor.DarkYellow;
+            write(Concat('+',EnergyCosts.GetCBBackWheel('b').ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
+            
+            //FrontWheel
+            Console.SetCursorPosition(50, 9);
+            Console.ForegroundColor := ConsoleColor.DarkGray;
+            write(Concat('+',EnergyCosts.GetCBFrontWheel('g').ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
+            Console.ForegroundColor := ConsoleColor.DarkYellow;
+            write(Concat('+',EnergyCosts.GetCBFrontWheel('b').ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
+            
+            Console.ForegroundColor:= ConsoleColor.Black;
+            {$endregion}
             
             
             KTX.read_1;
