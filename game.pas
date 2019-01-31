@@ -13453,7 +13453,7 @@ begin
                               begin
                                 if (player.bike.frame.suspensionflag) and (player.bike.bsusp.flag) then looping(balance.timing.bsusp_demontage,bikes[5].value[10]);
                                 
-                                looping(balance.timing.it_bsusping,items[18].value[7]);
+                                looping(balance.timing.it_bsusping,items[18].value[8]);
                                 
                                 if (player.bike.frame.suspensionflag) and (player.bike.bsusp.flag) then
                                 begin
