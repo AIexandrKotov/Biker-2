@@ -157,47 +157,11 @@ begin
   end;
 end;
 
-procedure KeyPress(c : Char);
-begin
-  case c of
-     #27,'0' : Window.Close;
-     '1':
-      begin
-        if (sc<maxsc) then
-        begin
-          sc+=stepsc;
-          DrawMap(current, sc);
-        end;
-      end;
-     '2':
-      begin
-        if (sc>minsc) then
-        begin
-          sc-=stepsc;
-          DrawMap(current, sc);
-        end;
-      end;
-     '3':
-      begin
-        if mxed then
-        begin
-          window.Normalize;
-          mxed:=false;
-        end
-        else
-        begin
-          window.Maximize;
-          mxed:=true;
-        end;
-      end;
-  end;
-end;
-
 procedure KeyDown(k: key);
 begin
   case k of
     key.Escape, key.NumPad0: Window.Close;
-    key.NumPad1, key.Z:
+    key.NumPad1, key.Z, Key.D1:
       begin
         if (sc<maxsc) then
         begin
@@ -205,7 +169,7 @@ begin
           DrawMap(current, sc);
         end;
       end;
-    key.NumPad2, key.X:
+    key.NumPad2, key.X, Key.D2:
       begin
         if (sc>minsc) then
         begin
@@ -213,7 +177,7 @@ begin
           DrawMap(current, sc);
         end;
       end;
-    key.C:
+    key.C, key.D3:
       begin
         if mxed then
         begin
@@ -243,7 +207,6 @@ begin
     window.Close;exit;
   end;
   try
-    //current:=StrToInt(CommandLineArgs[0]);
     var s:=CommandLineArgs;
     current:=StrToInt(s[0]);
     minsc:=StrToFloat(s[1]);
@@ -258,15 +221,11 @@ begin
   window.SetSize(500,500);
   window.Title:='Biker 2 Map Viewer';
   window.CenterOnScreen;
-  //window.IsFixedSize:=true;
-  //DrawInBuffer:=true;
   SetLength(types, 0);
   ReadMap('map.dat');
   sc:=5;
-  //PABCSystem.CommandLineArgs
   DrawMap(current, sc);
   GraphWPF.OnMouseDown:=MouseDown;
-  GraphWPF.OnKeyPress:=KeyPress;
   GraphWPF.OnKeyDown:=KeyDown;
   GraphWPF.OnResize:=_Res;
 end.
