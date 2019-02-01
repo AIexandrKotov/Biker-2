@@ -4351,13 +4351,13 @@ type
     begin
       if (player.bike.bsusp.flag) and (player.bike.frame.suspensionflag) then
       begin
-        if c='g' then Result += balance.bk.bsusp.suspension.flag0.roadg;
-        if c='b' then Result += balance.bk.bsusp.suspension.flag0.roadb;
+        if c='g' then Result += balance.bk.bsusp.suspension.flag1.roadg;
+        if c='b' then Result += balance.bk.bsusp.suspension.flag1.roadb;
       end
       else
       begin
-        if c='g' then Result += balance.bk.bsusp.suspension.flag1.roadg;
-        if c='b' then Result += balance.bk.bsusp.suspension.flag1.roadb;
+        if c='g' then Result += balance.bk.bsusp.suspension.flag0.roadg;
+        if c='b' then Result += balance.bk.bsusp.suspension.flag0.roadb;
       end;
       if player.bike.frame.suspensionflag then
       if player.bike.bsusp.flag then
@@ -5663,7 +5663,7 @@ begin
           with flag1 do
           begin
             minlevel := 4;
-            roadg := -0.25;
+            roadg := +0.25;
             roadb := 0;
           end;
         end;
