@@ -4349,7 +4349,7 @@ type
     end;
     public static function GetCBBack(c: char): real;
     begin
-      if player.bike.bsusp.flag then
+      if (player.bike.bsusp.flag) and (player.bike.frame.suspensionflag) then
       begin
         if c='g' then Result += balance.bk.bsusp.suspension.flag0.roadg;
         if c='b' then Result += balance.bk.bsusp.suspension.flag0.roadb;
@@ -5663,7 +5663,7 @@ begin
           with flag1 do
           begin
             minlevel := 4;
-            roadg := +0.25;
+            roadg := -0.25;
             roadb := 0;
           end;
         end;
@@ -7666,12 +7666,12 @@ begin
               write(inter[9].face[0],': ');
               if game.road.arr[i].tp.ToLower='g' then
               begin
-                Console.ForegroundColor := ConsoleColor.DarkGray;
+                if not game.road.arr[i].block then Console.ForegroundColor := ConsoleColor.DarkGray;
                 write(inter[9].face[1]);
               end
               else
               begin
-                Console.ForegroundColor := ConsoleColor.DarkYellow;
+                if not game.road.arr[i].block then Console.ForegroundColor := ConsoleColor.DarkYellow;
                 write(inter[9].face[2]);
               end;
               Console.ForegroundColor:=consolecolor.Black;
@@ -11311,8 +11311,8 @@ begin
                               or ((player.bike.frame.suspensionflag) and (player.bike.bsusp.flag) and (allveight(player.bike.frame.veight,player.bike.bsusp.veight)<=player.maxveight))
                               then
                               begin
-                                if ((not (player.bike.frame.suspensionflag)) and (player.energy>=balance.timing.it_framing.energy))
-                                or ((player.bike.frame.suspensionflag) and (player.bike.bsusp.flag) and (player.energy>=balance.timing.it_framing.energy+balance.timing.bsusp_demontage.energy)) then
+                                if ((not ((player.bike.frame.suspensionflag) and (player.bike.bsusp.flag))) and (player.energy>=balance.timing.it_framing.energy))
+                                or (((player.bike.frame.suspensionflag) and (player.bike.bsusp.flag)) and (player.energy >= balance.timing.it_framing.energy +balance.timing.bsusp_demontage.energy)) then
                                 begin
                                   write('(1) ',inter[22].face[18]);
                                 end
