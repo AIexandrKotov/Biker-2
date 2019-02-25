@@ -8549,47 +8549,64 @@ begin
             {$region RoadBonus}
             System.Globalization.NumberFormatInfo.CurrentInfo.PercentDecimalDigits := 0;
             //Frame & BackSuspension
+            var sttp := 80;
             var lbtp := 4 + balance.distancebetweenroadbonuses;
-            Console.SetCursorPosition(50, 2);
+            Console.SetCursorPosition(sttp, 2);
             Console.ForegroundColor := ConsoleColor.DarkGray;
             write(Concat('+',(EnergyCosts.GetCBFrame('g')+EnergyCosts.GetCBBack('g')).ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
             Console.ForegroundColor := ConsoleColor.DarkYellow;
             write(Concat('+',(EnergyCosts.GetCBFrame('b')+EnergyCosts.GetCBBack('b')).ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
             
             //Fork
-            Console.SetCursorPosition(50, 3);
+            Console.SetCursorPosition(sttp, 3);
             Console.ForegroundColor := ConsoleColor.DarkGray;
             write(Concat('+',EnergyCosts.GetCBFork('g').ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
             Console.ForegroundColor := ConsoleColor.DarkYellow;
             write(Concat('+',EnergyCosts.GetCBFork('b').ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
             
             //Transmission
-            Console.SetCursorPosition(50, 4);
+            Console.SetCursorPosition(sttp, 4);
             Console.ForegroundColor := ConsoleColor.DarkGray;
             write(Concat('+',EnergyCosts.GetCBTransmission('g').ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
             Console.ForegroundColor := ConsoleColor.DarkYellow;
             write(Concat('+',EnergyCosts.GetCBTransmission('b').ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
             
             //Rudder
-            Console.SetCursorPosition(50, 5);
+            Console.SetCursorPosition(sttp, 5);
             Console.ForegroundColor := ConsoleColor.DarkGray;
             write(Concat('+',EnergyCosts.GetCBRudder('g').ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
             Console.ForegroundColor := ConsoleColor.DarkYellow;
             write(Concat('+',EnergyCosts.GetCBRudder('b').ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
             
             //BackWheel
-            Console.SetCursorPosition(50, 8);
-            Console.ForegroundColor := ConsoleColor.DarkGray;
-            write(Concat('+',EnergyCosts.GetCBBackWheel('g').ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
-            Console.ForegroundColor := ConsoleColor.DarkYellow;
-            write(Concat('+',EnergyCosts.GetCBBackWheel('b').ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
+            Console.SetCursorPosition(sttp, 8);
+            if (Player.bike.Backwheel.camerahit) or (player.bike.backwheel.pressure < balance.bk.wheel.pressure.minimum) then
+            begin
+              Console.ForegroundColor := ConsoleColor.Red;
+              write('0%'.PadLeft(lbtp), '0%'.PadLeft(lbtp));
+            end
+            else
+            begin
+              Console.ForegroundColor := ConsoleColor.DarkGray;
+              write(Concat('+',EnergyCosts.GetCBBackWheel('g').ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
+              Console.ForegroundColor := ConsoleColor.DarkYellow;
+              write(Concat('+',EnergyCosts.GetCBBackWheel('b').ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
+            end;
             
             //FrontWheel
-            Console.SetCursorPosition(50, 9);
-            Console.ForegroundColor := ConsoleColor.DarkGray;
-            write(Concat('+',EnergyCosts.GetCBFrontWheel('g').ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
-            Console.ForegroundColor := ConsoleColor.DarkYellow;
-            write(Concat('+',EnergyCosts.GetCBFrontWheel('b').ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
+            Console.SetCursorPosition(sttp, 9);
+            if (player.bike.frontwheel.camerahit) or (player.bike.frontwheel.pressure < balance.bk.wheel.pressure.minimum) then
+            begin
+              Console.ForegroundColor := ConsoleColor.Red;
+              write('0%'.PadLeft(lbtp), '0%'.PadLeft(lbtp));
+            end
+            else
+            begin
+              Console.ForegroundColor := ConsoleColor.DarkGray;
+              write(Concat('+',EnergyCosts.GetCBFrontWheel('g').ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
+              Console.ForegroundColor := ConsoleColor.DarkYellow;
+              write(Concat('+',EnergyCosts.GetCBFrontWheel('b').ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
+            end;
             
             Console.ForegroundColor:= ConsoleColor.Black;
             {$endregion}
