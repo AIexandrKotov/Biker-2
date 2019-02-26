@@ -4349,7 +4349,7 @@ type
     end;
     public static function GetCBBack(c: char): real;
     begin
-      if (player.bike.bsusp.flag) and (player.bike.frame.suspensionflag) then
+      if (player.bike.bsusp.flag) and (player.bike.frame.suspensionflag) and (player.bike.bsusp.hitpoints > balance.criticalhp) then
       begin
         if c='g' then Result += balance.bk.bsusp.suspension.flag1.roadg;
         if c='b' then Result += balance.bk.bsusp.suspension.flag1.roadb;
@@ -4360,7 +4360,7 @@ type
         if c='b' then Result += balance.bk.bsusp.suspension.flag0.roadb;
       end;
       if player.bike.frame.suspensionflag then
-      if player.bike.bsusp.flag then
+      if (player.bike.bsusp.flag) and (player.bike.bsusp.hitpoints > balance.criticalhp) then
       begin
         if player.bike.bsusp.blocks then
         begin
@@ -8646,7 +8646,7 @@ begin
             if (bikeiscrash) then
             begin
               Console.ForegroundColor := ConsoleColor.Red;
-              write('0%'.PadLeft(lbtp), '0%'.PadLeft(lbtp));
+              write('0%'.PadLeft(lbtp+1), '0%'.PadLeft(lbtp+1));
             end
             else
             begin
