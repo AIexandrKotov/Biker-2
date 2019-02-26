@@ -8230,13 +8230,13 @@ begin
                 Console.ForegroundColor:=balance.status._verybad.color;
                 write(player.bike.frame.name,' ',Round((marker0)*1000)/10,'%');
               end;
-              Console.ForegroundColor:=consolecolor.Black;
               
               if (player.bike.bsusp.hitpoints<=balance.criticalhp) and (player.bike.frame.suspensionflag) and (player.bike.bsusp.flag) then
               begin
                 Console.ForegroundColor:=consolecolor.Red;
                 write(' (',bikes[1].value[4],')');
               end;
+              Console.ForegroundColor:=consolecolor.Black;
             end;
             
             Console.SetCursorPosition(1,3);write('(2) ',bikes[0].value[1],' ');
