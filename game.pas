@@ -12,7 +12,7 @@ const
   ///1) Изменить значения констаты версии
   ///2) Создать совместимость в v_compatibility, если это необходимо
   ///3) Копировать константу в установщик
-  version: record Major, Minor, Build: integer; end = (Major: 0; Minor: 9; Build: 35);
+  version: record Major, Minor, Build: integer; end = (Major: 0; Minor: 9; Build: 36);
   TEST = true;
   biker_name = 'Biker 2';
   questcount = 2;
@@ -362,7 +362,7 @@ type
       Console.SetBufferSize(maxx, maxy);
       Console.SetWindowSize(maxx, maxy);
       Console.CursorVisible:=false;
-      Console.Title:='Biker 2';
+      Console.Title:=biker_name;
       //Console.OpenStandardInput(0);
     end;
     public static procedure resize;
@@ -5091,7 +5091,7 @@ begin
     foodprice := 2/25;
     waterprice := 3/100;
     
-    distancebetweenroadbonuses  := 1;
+    distancebetweenroadbonuses  := 3;
     
     with MonthsKSpeed do
     begin
@@ -6692,6 +6692,7 @@ end;
 {$endregion}
 
 begin
+  System.Environment.CurrentDirectory := System.IO.Path.GetDirectoryName(GetEXEFileName);
   LowLoader.ToString;
   LowLoader := nil;
   LOG.Add('Biker 2 | Log information');
@@ -8646,14 +8647,14 @@ begin
             if (bikeiscrash) then
             begin
               Console.ForegroundColor := ConsoleColor.Red;
-              write('0%'.PadLeft(lbtp+1), '0%'.PadLeft(lbtp+1));
+              write('0%'.PadLeft(lbtp), '0%'.PadLeft(lbtp));
             end
             else
             begin
               Console.ForegroundColor := ConsoleColor.DarkGray;
-              write(Concat('+',(EnergyCosts.GetEnergyCost('g')-balance.bk.mincostG).ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp+1,' '));
+              write(Concat('+',(EnergyCosts.GetEnergyCost('g')-balance.bk.mincostG).ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
               Console.ForegroundColor := ConsoleColor.DarkYellow;
-              write(Concat('+',(EnergyCosts.GetEnergyCost('b')-balance.bk.mincostB).ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp+1,' '));
+              write(Concat('+',(EnergyCosts.GetEnergyCost('b')-balance.bk.mincostB).ToString('P')).Remove(' ').Replace('+-', '-').PadLeft(lbtp,' '));
             end;
             
             Console.ForegroundColor:= ConsoleColor.Black;
@@ -8854,7 +8855,7 @@ begin
                     begin
                       if player.bike.bsusp.blocks then
                       begin
-                        Console.ForegroundColor:=consolecolor.DarkGreen;
+                        Console.ForegroundColor:=consolecolor.DarkGray;
                         write(bikes[4].value[16]);
                       end
                       else
@@ -9069,7 +9070,7 @@ begin
                   begin
                     if player.bike.fork.blocks then
                     begin
-                      Console.ForegroundColor:=consolecolor.DarkGreen;
+                      Console.ForegroundColor:=consolecolor.DarkGray;
                       write(bikes[4].value[16]);
                     end
                     else
