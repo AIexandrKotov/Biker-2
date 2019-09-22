@@ -7,7 +7,7 @@
 
 //todo fixme
 
-uses GraphWPF, System;
+uses GraphWPF, System, System.IO;
  
 type
   tpmap = record
@@ -33,7 +33,7 @@ end;
   
 procedure ReadMap(fName : String);
 begin
-  if Not IO.File.Exists(fName)=true then Exit;
+  if Not System.IO.File.Exists(fName) then Exit;
   var txt := ReadAllText(fName, Encoding.UTF8).ToWords(#13#10.toArray);
   var (mapid1, mapid2) := (0, 0);
   foreach var s in txt do

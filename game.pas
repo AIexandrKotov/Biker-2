@@ -1461,7 +1461,7 @@ var
   BALANCE: TBalance;
   
   soundavailable: boolean;
-  SOUND: Media.SoundPlayer = new Media.SoundPlayer;
+  SOUND: System.Media.SoundPlayer = new System.Media.SoundPlayer;
   
   lowloader:=new TLoad;
   
